@@ -484,9 +484,11 @@ sót. Lý do bỏ sót được phân loại: \emph{chất lượng prompt}, \em
 \end{table}
 
 \section{Bug Reports — Feature A}
-% TODO: Mô tả từng bug tìm được
+Sáu lỗi ứng viên dưới đây được suy ra từ phân tích mã nguồn. Cần \textbf{xác nhận bằng thực
+thi}, chụp màn hình (đặt tại \texttt{figures/} hoặc \texttt{screenshots/}) và tạo GitHub Issue
+(điền URL vào ô tương ứng) trước khi nộp.
 
-\subsection{BUG-A-01: [Tên bug]}
+\subsection{BUG-A-01: Mật khẩu mạnh (có ký tự đặc biệt) bị từ chối}
 \begin{table}[H]
     \centering
     \begin{tabularx}{\linewidth}{L{3cm} X}
@@ -494,22 +496,117 @@ sót. Lý do bỏ sót được phân loại: \emph{chất lượng prompt}, \em
         \textbf{Trường} & \textbf{Nội dung} \\
         \midrule
         Bug ID       & BUG-A-01 \\
-        Tính năng    & [FR-xx] \\
-        Mức độ       & [Critical / Major / Minor / Trivial] \\
-        Mô tả        & [Mô tả ngắn gọn] \\
-        Tái hiện     & 1. [Bước 1] \newline 2. [Bước 2] \newline 3. [Bước 3] \\
-        Expected     & [Kết quả mong đợi] \\
-        Actual       & [Kết quả thực tế] \\
+        Tính năng    & FR-01 \quad\textbf{Kỹ thuật:} Domain + BVA \\
+        Mức độ       & Major \\
+        Mô tả        & Regex client bắt buộc có khoảng trắng và cấm ký tự đặc biệt; mật khẩu mạnh đúng đặc tả bị từ chối. \\
+        Tái hiện     & 1. Mở trang Đăng ký. \newline 2. Nhập name/email hợp lệ. \newline 3. Nhập mật khẩu \texttt{Password123!}. \newline 4. Bấm ``Đăng Ký''. \\
+        Expected     & Đăng ký thành công, chuyển tới \texttt{/login}. \\
+        Actual       & Báo lỗi ``Mật khẩu quá yếu!'' (dự đoán từ nguồn). \\
         GitHub Issue & \url{https://github.com/[group]/eshop-sut/issues/[number]} \\
         \bottomrule
     \end{tabularx}
 \end{table}
-% TODO: Chèn screenshot bug
-% \begin{figure}[H]
-%     \centering
-%     \includegraphics[width=0.8\linewidth]{bug_a_01.png}
-%     \caption{Screenshot — BUG-A-01}
-% \end{figure}
+% \begin{figure}[H]\centering\includegraphics[width=0.8\linewidth]{bug_a_01.png}\caption{Screenshot — BUG-A-01}\end{figure}
+
+\subsection{BUG-A-02: Mật khẩu yếu (không có ký tự đặc biệt) được chấp nhận}
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\linewidth}{L{3cm} X}
+        \toprule
+        \textbf{Trường} & \textbf{Nội dung} \\
+        \midrule
+        Bug ID       & BUG-A-02 \\
+        Tính năng    & FR-01 \quad\textbf{Kỹ thuật:} Domain \\
+        Mức độ       & Major \\
+        Mô tả        & Mật khẩu chỉ cần có khoảng trắng, không có ký tự đặc biệt vẫn qua regex — trái đặc tả. \\
+        Tái hiện     & 1. Mở trang Đăng ký. \newline 2. Nhập name/email hợp lệ. \newline 3. Nhập mật khẩu \texttt{Passw0rd 1}. \newline 4. Bấm ``Đăng Ký''. \\
+        Expected     & Từ chối (thiếu ký tự đặc biệt). \\
+        Actual       & Đăng ký thành công (dự đoán từ nguồn). \\
+        GitHub Issue & \url{https://github.com/[group]/eshop-sut/issues/[number]} \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+% \begin{figure}[H]\centering\includegraphics[width=0.8\linewidth]{bug_a_02.png}\caption{Screenshot — BUG-A-02}\end{figure}
+
+\subsection{BUG-A-03: Email sai định dạng được chấp nhận}
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\linewidth}{L{3cm} X}
+        \toprule
+        \textbf{Trường} & \textbf{Nội dung} \\
+        \midrule
+        Bug ID       & BUG-A-03 \\
+        Tính năng    & FR-01 \quad\textbf{Kỹ thuật:} Domain \\
+        Mức độ       & Major \\
+        Mô tả        & Trường email dùng \texttt{type="text"}, không có kiểm tra định dạng ở UI lẫn backend. \\
+        Tái hiện     & 1. Mở trang Đăng ký. \newline 2. Nhập email \texttt{notanemail}, mật khẩu \texttt{Passw0rd 1}. \newline 3. Bấm ``Đăng Ký''. \\
+        Expected     & Từ chối vì email không hợp lệ. \\
+        Actual       & Đăng ký thành công (dự đoán từ nguồn). \\
+        GitHub Issue & \url{https://github.com/[group]/eshop-sut/issues/[number]} \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+% \begin{figure}[H]\centering\includegraphics[width=0.8\linewidth]{bug_a_03.png}\caption{Screenshot — BUG-A-03}\end{figure}
+
+\subsection{BUG-A-04: Cho phép email trùng lặp}
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\linewidth}{L{3cm} X}
+        \toprule
+        \textbf{Trường} & \textbf{Nội dung} \\
+        \midrule
+        Bug ID       & BUG-A-04 \\
+        Tính năng    & FR-01 \quad\textbf{Kỹ thuật:} Domain \\
+        Mức độ       & Critical \\
+        Mô tả        & Cột \texttt{email} không \texttt{UNIQUE}; đăng ký trùng email tạo bản ghi thứ hai, phá vỡ định danh khi đăng nhập. \\
+        Tái hiện     & 1. Đăng ký với \texttt{test@eshop.com} (đã tồn tại trong seed). \newline 2. Quan sát phản hồi. \\
+        Expected     & Từ chối vì email đã tồn tại. \\
+        Actual       & Tạo thêm một user thứ hai (dự đoán từ nguồn). \\
+        GitHub Issue & \url{https://github.com/[group]/eshop-sut/issues/[number]} \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+% \begin{figure}[H]\centering\includegraphics[width=0.8\linewidth]{bug_a_04.png}\caption{Screenshot — BUG-A-04}\end{figure}
+
+\subsection{BUG-A-05: Backend không kiểm tra dữ liệu (đăng ký body rỗng thành công)}
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\linewidth}{L{3cm} X}
+        \toprule
+        \textbf{Trường} & \textbf{Nội dung} \\
+        \midrule
+        Bug ID       & BUG-A-05 \\
+        Tính năng    & FR-01 \quad\textbf{Kỹ thuật:} Domain + BVA \\
+        Mức độ       & Major \\
+        Mô tả        & \texttt{POST /api/register} chèn thẳng vào DB, không kiểm rỗng/định dạng/độ dài; gọi API trực tiếp bỏ qua mọi kiểm tra của UI. \\
+        Tái hiện     & 1. Gửi \texttt{POST /api/register} với body \texttt{\{\}} (hoặc mật khẩu \texttt{"1"}, hoặc chuỗi dài 100.000 ký tự). \\
+        Expected     & \texttt{400 Bad Request}, từ chối. \\
+        Actual       & \texttt{200 OK} ``User registered successfully'', tạo bản ghi (dự đoán từ nguồn). \\
+        GitHub Issue & \url{https://github.com/[group]/eshop-sut/issues/[number]} \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+% \begin{figure}[H]\centering\includegraphics[width=0.8\linewidth]{bug_a_05.png}\caption{Screenshot — BUG-A-05}\end{figure}
+
+\subsection{BUG-A-06: Mật khẩu lưu plaintext và trả về qua API}
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\linewidth}{L{3cm} X}
+        \toprule
+        \textbf{Trường} & \textbf{Nội dung} \\
+        \midrule
+        Bug ID       & BUG-A-06 \\
+        Tính năng    & FR-01 \quad\textbf{Kỹ thuật:} Domain \\
+        Mức độ       & Critical \\
+        Mô tả        & Mật khẩu được lưu dạng văn bản thuần và trả về nguyên văn trong \texttt{GET /api/users/me} và danh sách admin. \\
+        Tái hiện     & 1. Đăng ký một tài khoản. \newline 2. Đăng nhập, gọi \texttt{GET /api/users/me}. \newline 3. Xem trường \texttt{password}. \\
+        Expected     & Mật khẩu được băm; API không trả về mật khẩu. \\
+        Actual       & Trả về mật khẩu plaintext (dự đoán từ nguồn). \\
+        GitHub Issue & \url{https://github.com/[group]/eshop-sut/issues/[number]} \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+% \begin{figure}[H]\centering\includegraphics[width=0.8\linewidth]{bug_a_06.png}\caption{Screenshot — BUG-A-06}\end{figure}
 
 % ============================================================
 %  CHƯƠNG 3: FEATURE B — POOL B
