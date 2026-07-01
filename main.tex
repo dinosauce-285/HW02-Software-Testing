@@ -404,9 +404,18 @@ học. Vì vậy Domain Testing phát hiện nhiều lỗi hơn BVA thuần túy
     \endfoot
     \bottomrule
     \endlastfoot
-    % TODO: Điền các test case
-    TC-A-DT-01 & [Mô tả] & [Input] & [Expected] & [Actual] & \textcolor{green!60!black}{Pass} \\
-    TC-A-DT-02 & [Mô tả] & [Input] & [Expected] & [Actual] & \textcolor{red}{Fail} \\
+    TC-A-DT-01 & MK mạnh có ký tự đặc biệt, đúng đặc tả \newline (BUG-A-01) & pw=\texttt{Password123!} & Đăng ký OK, sang \texttt{/login} & Báo ``MK quá yếu'' & \textcolor{red}{Fail} \\
+    TC-A-DT-02 & MK qua regex: có ws, không ký tự đặc biệt \newline (BUG-A-02) & pw=\texttt{Passw0rd 1} & Từ chối (thiếu ký tự đặc biệt) & Đăng ký OK & \textcolor{red}{Fail} \\
+    TC-A-DT-03 & Thiếu chữ hoa & pw=\texttt{passw0rd 1} & Từ chối & Từ chối & \textcolor{green!60!black}{Pass} \\
+    TC-A-DT-04 & Thiếu chữ số & pw=\texttt{Password x} & Từ chối & Từ chối & \textcolor{green!60!black}{Pass} \\
+    TC-A-DT-05 & Có ký tự đặc biệt kèm ws \newline (BUG-A-01) & pw=\texttt{Passw0rd !} & Chấp nhận (MK mạnh) & Từ chối (cấm `!') & \textcolor{red}{Fail} \\
+    TC-A-DT-06 & Email sai định dạng \newline (BUG-A-03) & email=\texttt{notanemail} & Từ chối email không hợp lệ & Đăng ký OK & \textcolor{red}{Fail} \\
+    TC-A-DT-07 & Email trùng đã tồn tại \newline (BUG-A-04) & email=\texttt{test@eshop.com} & Từ chối trùng & Tạo bản ghi thứ 2 & \textcolor{red}{Fail} \\
+    TC-A-DT-08 & (API) Body rỗng \newline (BUG-A-05) & \texttt{POST \{\}} & 400 từ chối & 200, user toàn NULL & \textcolor{red}{Fail} \\
+    TC-A-DT-09 & (API) MK rất yếu \newline (BUG-A-05) & pw=\texttt{"1"} & Từ chối & 200 registered & \textcolor{red}{Fail} \\
+    TC-A-DT-10 & (API) Payload injection ở email & email=\texttt{x'; DROP TABLE users;-{}-} & Chặn/thoát an toàn & Lưu literal, 200 (tham số hóa) & \textcolor{green!60!black}{Pass} \\
+    TC-A-DT-11 & Tên chỉ khoảng trắng & name=\verb|"   "| & Từ chối (rỗng ngữ nghĩa) & \texttt{required} cho qua, OK & \textcolor{red}{Fail} \\
+    TC-A-DT-12 & (API) Cách lưu mật khẩu \newline (BUG-A-06) & Đăng ký rồi \texttt{GET /users/me} & MK đã băm, không trả về & Trả về MK plaintext & \textcolor{red}{Fail} \\
 \end{longtable}
 
 \section{Boundary Value Analysis (BVA)}
