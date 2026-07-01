@@ -161,5 +161,60 @@ satisfies the \emph{documented} rule but is \emph{rejected} by the code. ``Valid
 inputs a correct system should accept but which no layer constrains. These starred classes
 are exactly where the feature is expected to be wrong.
 
+% ------------------------------------------------------------
+\section{Step 4 --- Identify boundaries}
+\label{sec:bounds}
+Registration has one genuinely \emph{ordered}, numerically bounded variable and several
+implicit ones:
+
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Password length} --- boundary at \textbf{8}, \emph{inclusive} on the valid
+  side (regex \verb|{8,}|). This is the only well-defined numeric boundary and the target of
+  the BVA in Step~6. The character-class conditions (lower/upper/digit/whitespace/special)
+  are boolean partitions, not ordered boundaries, so they are covered by Step~3, not BVA.
+  \item \textbf{Name / email length} --- lower boundary is ``non-empty'' (1 char) enforced
+  only by the UI \texttt{required} attribute; \emph{no} upper boundary is documented or
+  enforced (SQLite \texttt{TEXT} is unbounded). The upper edge is therefore an
+  \emph{undefined} boundary --- itself a finding (Step~8).
+  \item \textbf{Email uniqueness} --- a degenerate ``count'' boundary: 0 existing copies
+  (valid) vs $\ge 1$ existing copies (should be invalid). Never enforced.
+\end{itemize}
+
+\noindent\textbf{Key observation.} The length boundary (\verb|{8,}|) is implemented
+\emph{correctly} --- there is no off-by-one at 8. The planted defects live in the
+\emph{character-class} conditions (whitespace-required, special-forbidden), which is why
+Domain partitioning (Step~3) finds more bugs here than pure BVA. A naive ``just do BVA on
+length'' pass would miss them.
+
+\section{Step 5 --- Domain matrix (on-point / off-point)}
+\label{sec:matrix}
+Classic $1\times1$ analysis of the password-length boundary. Every value below is
+constructed to satisfy all \emph{other} regex conditions (one lowercase, one uppercase, one
+digit, one space, only allowed characters) so that length is the single variable under test.
+
+\begin{center}
+\begin{tabular}{L{3.4cm} L{2.6cm} L{2.4cm} L{2.9cm} L{2.9cm}}
+\toprule
+\textbf{Boundary} & \textbf{on-point (=8)} & \textbf{off-point (7)} & \textbf{Expected on} & \textbf{Expected off} \\
+\midrule
+password length $\ge 8$ & \texttt{Aa1 bcde} (8) & \texttt{Aa1 bcd} (7) & Accept (regex passes) & Reject (too short) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{tabular}{L{3.4cm} L{4.0cm} L{4.0cm}}
+\toprule
+ & \textbf{in-point (interior valid)} & \textbf{out-point (clearly outside)} \\
+\midrule
+password length $\ge 8$ & \texttt{Aa1 bcdefgh} (11) $\to$ Accept & \verb|""| (length 0) $\to$ Reject \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent The ``pass'' side is length~$\ge 8$. Predicted behaviour matches Expected for this
+boundary (length is correct); the divergences appear only when the class conditions are
+varied (Step~7).
+
 % APPEND-BELOW
 \end{document}
