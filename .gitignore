@@ -1,2 +1,46 @@
 # System Under Test (external app, not a deliverable)
 eshop-sut/
+
+# ---------- LaTeX build artifacts ----------
+*.aux
+*.log
+*.toc
+*.lof
+*.lot
+*.out
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.synctex(busy)
+*.bbl
+*.blg
+*.bcf
+*.run.xml
+*.nav
+*.snm
+*.vrb
+*.idx
+*.ind
+*.ilg
+*.glo
+*.gls
+*.glg
+*.acn
+*.acr
+*.alg
+*.xdy
+texput.log
+# Compiled PDF is generated from main.tex; uncomment to also ignore it:
+# *.pdf
+
+# ---------- Editor / OS junk ----------
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.idea/
+*.sublime-workspace
+
+# ---------- Temp / scratch ----------
+*.tmp
+scratchpad/
