@@ -255,7 +255,7 @@ DB (kèm mật khẩu plaintext, \texttt{role='user'}), và điều hướng san
 \emph{``Tối thiểu 8 ký tự, có chữ hoa, chữ thường, số và ký tự đặc biệt.''}
 Tuy nhiên regex thực tế được cài đặt là:
 
-\begin{lstlisting}[language=,caption={Regex kiểm tra mật khẩu (Register.jsx)}]
+\begin{lstlisting}[caption={Regex kiểm tra mật khẩu (Register.jsx)},numbers=none]
 /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\s)[A-Za-z\d\s]{8,}$/
 \end{lstlisting}
 
@@ -749,32 +749,35 @@ thi}, chụp màn hình (đặt tại \texttt{figures/} hoặc \texttt{screensho
 \chapter{AI Audit Report}
 
 \section*{Khai Báo Sử Dụng AI}
-% TODO: Điền vào theo quy định — xóa dòng không phù hợp
-
-\textit{``I use AI tools for the following tasks:''} [hoặc: \textit{``I do not use any AI help in this exercise.''}]
+\textit{``I use AI tools for the following tasks.''}
 
 \section*{Log Các Phiên Làm Việc Với AI}
 
 % ---- Interaction 1 ----
-\subsection*{Interaction 1}
+\subsection*{Interaction 1 — Domain Testing \& BVA cho FR-01 (Đăng ký tài khoản)}
 \begin{table}[H]
     \centering
     \begin{tabularx}{\linewidth}{L{3.5cm} X}
         \toprule
         \textbf{Trường} & \textbf{Nội dung} \\
         \midrule
-        Công cụ AI    & [Claude / ChatGPT / Gemini / ...] \\
-        Ngày giờ      & [YYYY-MM-DD HH:MM] \\
-        Mục đích      & [Mục đích sử dụng AI] \\
+        Công cụ AI    & Claude Code (Opus 4.8) \\
+        Ngày giờ      & 2026-07-01 21:57 \\
+        Mục đích      & Áp dụng Domain Testing + Boundary Value Analysis cho FR-01, phân tích mã nguồn EShop và thiết kế ca kiểm thử, gap analysis, báo cáo lỗi. \\
         \midrule
         \textbf{Prompt} & \\
         \multicolumn{2}{p{\linewidth}}{%
-            \texttt{[Paste prompt của bạn vào đây]}
+            \texttt{/domain-bva-test Do requirement 6 (HW02-Domain-Testing.md, Homework-Policies.md, CLAUDE.md)} — kèm hướng dẫn từng bước trong skill \texttt{domain-bva-test} và yêu cầu điền trực tiếp vào \texttt{main.tex} bằng tiếng Việt, chế độ thực thi ``sinh viên tự chạy, AI dự đoán''.
         } \\
         \midrule
         \textbf{AI Output} & \\
         \multicolumn{2}{p{\linewidth}}{%
-            [Tóm tắt hoặc paste output của AI]
+            AI đọc \texttt{backend/server.js}, \texttt{backend/database.js} và \texttt{frontend-web/src/pages/Register.jsx}; xác định 8 biến (kể cả biến ẩn), phân hoạch miền cho name/email/password (EC-N/E/P), chọn điểm ON/OFF/IN cho biên độ dài mật khẩu, sinh 12 ca Domain (TC-A-DT) + 6 ca BVA (TC-A-BV), bảng AI gap analysis (6 mục), và 6 báo cáo lỗi ứng viên (BUG-A-01..06) suy ra từ mã nguồn. Khiếm khuyết trọng tâm: regex mật khẩu bắt buộc khoảng trắng và cấm ký tự đặc biệt (ngược đặc tả); backend không kiểm tra dữ liệu; email không \texttt{UNIQUE}; mật khẩu lưu plaintext.
+        } \\
+        \midrule
+        \textbf{Human review} & \\
+        \multicolumn{2}{p{\linewidth}}{%
+            Sinh viên (Lý Quốc Thạnh) chịu trách nhiệm: cần \emph{thực thi} các ca trên EShop để điền cột Kết quả/Trạng thái thực tế, chụp màn hình và tạo GitHub Issue cho từng bug đã xác nhận. Các giá trị ``dự đoán từ nguồn'' phải được kiểm chứng trước khi nộp.
         } \\
         \bottomrule
     \end{tabularx}
