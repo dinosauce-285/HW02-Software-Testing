@@ -1011,21 +1011,240 @@ chụp màn hình và tạo GitHub Issue trước khi nộp.
 % ============================================================
 %  CHƯƠNG 4: FEATURE C — POOL C
 % ============================================================
-\chapter{Feature C — [Tên tính năng] (Pool C)}
+\chapter{Feature C — Quản lý danh mục (Pool C — Web Admin)}
 
 \section{Mô Tả Tính Năng}
-\section{Domain Testing}
-\subsection{Bước 1: Xác Định Các Biến Đầu Vào}
-\subsection{Bước 2: Phân Hoạch Miền}
-\subsection{Bước 3: Chọn Điểm Kiểm Thử}
-\subsection{Bước 4: Thiết Kế Test Cases — Domain Testing}
+Tính năng \textbf{FR-14 — Quản lý danh mục (CRUD)} thuộc trang \emph{Web Admin}, cho phép
+thêm/sửa/xóa danh mục sản phẩm. Toàn bộ logic nằm ở 4 endpoint trong
+\texttt{backend/server.js}; bảng \texttt{categories} khai báo ở \texttt{backend/database.js}.
 
-\section{Boundary Value Analysis}
+\begin{itemize}
+    \item \texttt{GET /api/categories} — \emph{công khai} (không xác thực), trả về mọi danh mục.
+    \item \texttt{POST /api/categories} — \texttt{authenticateToken}, body \verb|{name}| $\to$
+    \texttt{INSERT INTO categories (name)}.
+    \item \texttt{PUT /api/categories/:id} — \texttt{authenticateToken}, \verb|{name}| $\to$
+    \texttt{UPDATE categories SET name=? WHERE id=?}.
+    \item \texttt{DELETE /api/categories/:id} — \texttt{authenticateToken} $\to$
+    \texttt{DELETE FROM categories WHERE id=?}.
+\end{itemize}
+
+\noindent\textbf{Lược đồ:} \texttt{categories(id INTEGER PK AUTOINCREMENT, name TEXT)} — cột
+\texttt{name} \emph{không} \texttt{NOT NULL}, \emph{không} \texttt{UNIQUE}, không giới hạn độ
+dài. Bảng \texttt{products} có \texttt{category\_id INTEGER} nhưng \emph{không có khóa ngoại}
+(foreign key) trỏ tới \texttt{categories}. \textbf{Seed:} 3 danh mục — \texttt{1=Điện thoại}
+(có 2 sản phẩm), \texttt{2=Laptop} (1 sản phẩm), \texttt{3=Phụ kiện} (2 sản phẩm).
+
+\vspace{4pt}
+\noindent\textbf{Middleware \texttt{authenticateToken}} chỉ kiểm tra JWT \emph{hợp lệ}
+(\texttt{jwt.verify}) rồi gán \texttt{req.user}; \textbf{không} kiểm tra \texttt{role ===
+"admin"}. Do đó \emph{bất kỳ} người dùng đã đăng nhập (kể cả \texttt{role='user'}) đều gọi được
+các endpoint quản trị này.
+
+\begin{notebox}
+Khiếm khuyết trọng tâm của chương: \textbf{(1)} thiếu kiểm soát truy cập theo vai trò — CRUD
+danh mục (chức năng admin) mở cho mọi tài khoản đăng nhập; \textbf{(2)} không kiểm tra dữ liệu
+\texttt{name} (rỗng/trùng/quá dài); \textbf{(3)} PUT/DELETE trên \texttt{id} không tồn tại vẫn
+trả \texttt{200} thành công (không kiểm \texttt{this.changes}); \textbf{(4)} xóa danh mục làm
+\emph{mồ côi} sản phẩm (không khóa ngoại/cascade).
+\end{notebox}
+
+\begin{notebox}
+\textbf{Quy ước cột kết quả} (như Feature A/B): cột \emph{Kết quả}/\emph{Trạng thái} là giá trị
+\textbf{dự đoán từ phân tích mã nguồn}, cần xác nhận khi chạy thật + chụp màn hình.
+\end{notebox}
+
+\section{Domain Testing}
+
+\subsection{Bước 1: Xác Định Các Biến Đầu Vào}
+\begin{table}[H]
+    \centering
+    \caption{Danh sách biến — Feature C (FR-14)}
+    \begin{tabularx}{\linewidth}{C{0.5cm} L{3cm} L{2.6cm} C{1.8cm} X}
+        \toprule
+        \textbf{\#} & \textbf{Biến} & \textbf{Kiểu} & \textbf{Vào/Ra} & \textbf{Ghi chú} \\
+        \midrule
+        1 & name & string (TEXT) & Input & POST/PUT; không kiểm rỗng/trùng/độ dài. \\
+        2 & id & integer (path) & Input & PUT/DELETE; phải tồn tại (seed 1..3). \\
+        3 & token.role & string (JWT) & Input & \emph{Nên} yêu cầu \texttt{admin}; code chỉ cần token hợp lệ. \\
+        4 & name.length & integer (ẩn) & Input & Không có min ($>0$)/max $\Rightarrow$ dùng BVA. \\
+        5 & name.isUnique & boolean (ẩn) & Input & Không có \texttt{UNIQUE} $\Rightarrow$ cho trùng. \\
+        6 & category.hasProducts & boolean (ẩn) & Trạng thái & Ảnh hưởng toàn vẹn khi xóa. \\
+        7 & HTTP status / changes & integer & \textbf{Output} & 200/401/403; số dòng bị tác động. \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\subsection{Bước 2: Phân Hoạch Miền}
+Dấu \emph{*} = lớp mà hệ thống \emph{đúng} phải xử lý theo đặc tả nhưng mã hiện tại làm sai.
+
+\subsubsection{Biến name}
+\begin{table}[H]
+    \centering
+    \caption{Phân hoạch miền — name}
+    \begin{tabularx}{\linewidth}{C{1.4cm} L{6cm} C{1.6cm} X}
+        \toprule
+        \textbf{EC} & \textbf{Điều kiện} & \textbf{Loại} & \textbf{Ví dụ} \\
+        \midrule
+        EC-NM1 & Tên mới, không rỗng, chưa trùng & Valid & \texttt{Sách} \\
+        EC-NM2 & Rỗng & Invalid & \verb|""| \\
+        EC-NM3 & Chỉ khoảng trắng & Invalid & \verb|"   "| \\
+        EC-NM4 & Thiếu trường (\texttt{undefined}$\to$NULL) & Invalid & \texttt{POST \{\}} \\
+        EC-NM5 & Trùng tên đã tồn tại & Invalid* & \texttt{Laptop} \\
+        EC-NM6 & Rất dài (không có max) & Valid* & 100.000 ký tự \\
+        EC-NM7 & Payload injection & Invalid & \texttt{x'; DROP TABLE categories;-{}-} \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\subsubsection{Biến id (PUT/DELETE)}
+\begin{table}[H]
+    \centering
+    \caption{Phân hoạch miền — id}
+    \begin{tabularx}{\linewidth}{C{1.4cm} L{6cm} C{1.6cm} X}
+        \toprule
+        \textbf{EC} & \textbf{Điều kiện} & \textbf{Loại} & \textbf{Ví dụ} \\
+        \midrule
+        EC-ID1 & id tồn tại (seed) & Valid & \texttt{1} \\
+        EC-ID2 & id không tồn tại & Invalid* & \texttt{999} \\
+        EC-ID3 & id không phải số & Invalid & \texttt{abc} \\
+        EC-ID4 & id danh mục \emph{đang có sản phẩm} & Invalid* & \texttt{1} (khi xóa) \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\subsubsection{Biến quyền (token/role)}
+\begin{table}[H]
+    \centering
+    \caption{Phân hoạch miền — quyền truy cập}
+    \begin{tabularx}{\linewidth}{C{1.4cm} L{6.5cm} C{1.6cm} X}
+        \toprule
+        \textbf{EC} & \textbf{Điều kiện} & \textbf{Loại} & \textbf{Kỳ vọng} \\
+        \midrule
+        EC-AU1 & Token admin & Valid & Cho phép \\
+        EC-AU2 & Token user thường & Invalid* & \emph{Nên} 403; code cho qua \\
+        EC-AU3 & Không có token & Invalid & 401 (đúng) \\
+        EC-AU4 & Token sai/hết hạn & Invalid & 403 (đúng) \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\subsection{Bước 3: Chọn Điểm Kiểm Thử (ON/OFF/IN/OUT)}
+Biến có thứ tự là \texttt{id} với miền hợp lệ (danh mục tồn tại) $= [1,3]$ theo seed. Áp dụng
+ON/OFF/IN/OUT trên \emph{ranh giới tồn tại}.
+
+\begin{table}[H]
+    \centering
+    \caption{Điểm ON/OFF/IN/OUT — id danh mục (miền tồn tại $[1,3]$)}
+    \begin{tabularx}{\linewidth}{L{2.4cm} C{2cm} X}
+        \toprule
+        \textbf{Loại điểm} & \textbf{id} & \textbf{Kỳ vọng (đặc tả)} \\
+        \midrule
+        ON (min)   & 1 & Tồn tại $\to$ sửa/xóa OK \\
+        ON (max)   & 3 & Tồn tại $\to$ sửa/xóa OK \\
+        OFF (dưới) & 0 & Không tồn tại $\to$ \texttt{404} \\
+        OFF (trên) & 4 & Không tồn tại $\to$ \texttt{404} \\
+        OUT        & 999 & Không tồn tại $\to$ \texttt{404} \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\noindent\textbf{Nhận xét:} mã \emph{không} kiểm \texttt{this.changes} nên mọi điểm OFF/OUT
+(id không tồn tại) đều trả \texttt{200 ``updated/deleted''} thay vì \texttt{404} — lỗi ``thành
+công giả'' (BUG-C-04).
+
+\subsection{Bước 4: Thiết Kế Test Cases — Domain Testing}
+\begin{longtable}{C{1.2cm} L{3.1cm} L{3.1cm} L{3cm} C{1.9cm} C{1.4cm}}
+    \caption{Test cases — Domain Testing, Feature C} \\
+    \toprule
+    \textbf{TC\#} & \textbf{Mô tả} & \textbf{Input} & \textbf{Expected Output} & \textbf{Kết quả} & \textbf{Trạng thái} \\
+    \midrule
+    \endfirsthead
+    \multicolumn{6}{c}{\small\itshape (tiếp theo)} \\
+    \toprule
+    \textbf{TC\#} & \textbf{Mô tả} & \textbf{Input} & \textbf{Expected Output} & \textbf{Kết quả} & \textbf{Trạng thái} \\
+    \midrule
+    \endhead
+    \midrule
+    \multicolumn{6}{r}{\small\itshape (còn tiếp)} \\
+    \endfoot
+    \bottomrule
+    \endlastfoot
+    TC-C-DT-01 & Tạo danh mục hợp lệ (admin) & POST \texttt{\{name:"Sách"\}} & 200, trả \texttt{id} & 200 & \textcolor{green!60!black}{Pass} \\
+    TC-C-DT-02 & Tạo với tên rỗng \newline (BUG-C-02) & POST \texttt{\{name:""\}} & 400 từ chối & 200 tạo bản ghi rỗng & \textcolor{red}{Fail} \\
+    TC-C-DT-03 & Tạo thiếu name \newline (BUG-C-02) & POST \texttt{\{\}} & 400 từ chối & 200, \texttt{name=NULL} & \textcolor{red}{Fail} \\
+    TC-C-DT-04 & Tạo tên trùng \newline (BUG-C-03) & POST \texttt{\{name:"Laptop"\}} & Từ chối trùng & 200 tạo ``Laptop'' thứ 2 & \textcolor{red}{Fail} \\
+    TC-C-DT-05 & Tạo bằng token user thường \newline (BUG-C-01) & POST (role=user) & 403 Forbidden & 200 tạo thành công & \textcolor{red}{Fail} \\
+    TC-C-DT-06 & Tạo khi không có token & POST (no auth) & 401 Unauthorized & 401 & \textcolor{green!60!black}{Pass} \\
+    TC-C-DT-07 & Tạo với token sai & POST (token hỏng) & 403 Forbidden & 403 & \textcolor{green!60!black}{Pass} \\
+    TC-C-DT-08 & Sửa danh mục tồn tại & PUT \texttt{/1 \{name:"Điện thoại"\}} & 200 updated & 200 & \textcolor{green!60!black}{Pass} \\
+    TC-C-DT-09 & Sửa id không tồn tại \newline (BUG-C-04) & PUT \texttt{/999} & 404 & 200 ``updated'' (0 dòng) & \textcolor{red}{Fail} \\
+    TC-C-DT-10 & Xóa danh mục rỗng (không sp) & DELETE danh mục vừa tạo & 200 deleted & 200 & \textcolor{green!60!black}{Pass} \\
+    TC-C-DT-11 & Xóa id không tồn tại \newline (BUG-C-04) & DELETE \texttt{/999} & 404 & 200 ``deleted'' & \textcolor{red}{Fail} \\
+    TC-C-DT-12 & Xóa danh mục đang có sản phẩm \newline (BUG-C-05) & DELETE \texttt{/1} (2 sp) & Chặn/cascade & 200, sản phẩm mồ côi & \textcolor{red}{Fail} \\
+    TC-C-DT-13 & Payload injection ở name & POST \texttt{x'; DROP TABLE\ldots} & Lưu literal an toàn & 200, tham số hóa & \textcolor{green!60!black}{Pass} \\
+    TC-C-DT-14 & id không phải số \newline (BUG-C-04) & DELETE \texttt{/abc} & 400/404 & 200 (0 dòng) & \textcolor{orange}{Note} \\
+\end{longtable}
+
+\section{Boundary Value Analysis (BVA)}
+
 \subsection{Bước 1: Xác Định Ranh Giới}
+\begin{table}[H]
+    \centering
+    \caption{Bảng giá trị biên — Feature C (FR-14)}
+    \begin{tabularx}{\linewidth}{L{3.2cm} C{1.8cm} C{1.8cm} C{1.8cm} X}
+        \toprule
+        \textbf{Biên} & \textbf{Off/dưới} & \textbf{On} & \textbf{Off/trên} & \textbf{Ghi chú} \\
+        \midrule
+        id tồn tại $[1,3]$ & 0 & 1 và 3 & 4 & id ngoài miền vẫn trả 200 (BUG-C-04). \\
+        name.length & 0 (rỗng) & 1 & --- (không max) & length 0 bị nhận (BUG-C-02); không có biên trên (BUG-C-06). \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
 \subsection{Bước 2: Thiết Kế Test Cases — BVA}
+\begin{longtable}{C{1.2cm} L{3.2cm} L{3.1cm} L{3cm} C{1.9cm} C{1.4cm}}
+    \caption{Test cases — BVA, Feature C} \\
+    \toprule
+    \textbf{TC\#} & \textbf{Mô tả} & \textbf{Input} & \textbf{Expected Output} & \textbf{Kết quả} & \textbf{Trạng thái} \\
+    \midrule
+    \endfirsthead
+    \toprule
+    \textbf{TC\#} & \textbf{Mô tả} & \textbf{Input} & \textbf{Expected Output} & \textbf{Kết quả} & \textbf{Trạng thái} \\
+    \midrule
+    \endhead
+    \bottomrule
+    \endlastfoot
+    TC-C-BV-01 & id dưới biên \newline (BUG-C-04) & DELETE \texttt{/0} & 404 & 200 ``deleted'' & \textcolor{red}{Fail} \\
+    TC-C-BV-02 & id min hợp lệ & PUT \texttt{/1} & 200 updated & 200 & \textcolor{green!60!black}{Pass} \\
+    TC-C-BV-03 & id max hợp lệ & PUT \texttt{/3} & 200 updated & 200 & \textcolor{green!60!black}{Pass} \\
+    TC-C-BV-04 & id trên biên (max+1) \newline (BUG-C-04) & DELETE \texttt{/4} & 404 & 200 ``deleted'' & \textcolor{red}{Fail} \\
+    TC-C-BV-05 & name rỗng (length 0) \newline (BUG-C-02) & POST \texttt{\{name:""\}} & 400 từ chối & 200 tạo được & \textcolor{red}{Fail} \\
+    TC-C-BV-06 & name length 1 & POST \texttt{\{name:"A"\}} & 200 & 200 & \textcolor{green!60!black}{Pass} \\
+    TC-C-BV-07 & name cực dài \newline (BUG-C-06) & POST name 100.000 ký tự & Nên giới hạn/từ chối & 200 lưu toàn bộ & \textcolor{red}{Fail} \\
+\end{longtable}
 
 \section{AI Gap Analysis}
+\begin{table}[H]
+    \centering
+    \caption{AI Gap Analysis — Feature C (FR-14)}
+    \begin{tabularx}{\linewidth}{C{0.5cm} X L{4cm} C{1.8cm}}
+        \toprule
+        \textbf{\#} & \textbf{Ca/bug bị bỏ sót} & \textbf{Lý do bỏ sót} & \textbf{Bổ sung ở TC} \\
+        \midrule
+        1 & Thiếu kiểm soát truy cập theo vai trò (admin) — user thường CRUD được danh mục. & Giới hạn công cụ (AI tập trung dữ liệu đầu vào, bỏ sót tầng phân quyền/middleware). & TC-C-DT-05 \\
+        2 & PUT/DELETE id không tồn tại trả 200 (không kiểm \texttt{this.changes}) — ``thành công giả''. & Chất lượng prompt (chỉ thử happy path) + biến \emph{đầu ra/trạng thái}. & TC-C-DT-09/11, BV-01/04 \\
+        3 & Xóa danh mục làm mồ côi sản phẩm (không khóa ngoại/cascade). & Độ phức tạp nội tại (toàn vẹn tham chiếu, tương tác đa bảng). & TC-C-DT-12 \\
+        4 & Trùng tên danh mục (không \texttt{UNIQUE}). & Chất lượng prompt (cần đọc kỹ ràng buộc lược đồ). & TC-C-DT-04 \\
+        5 & Tên rỗng/NULL được chấp nhận (backend không kiểm). & Độ phức tạp (validation tách tầng UI/API). & TC-C-DT-02/03, BV-05 \\
+        6 & Không giới hạn độ dài trên của \texttt{name}. & Độ phức tạp/robustness; BVA thường chỉ nhìn biên đã đặc tả. & TC-C-BV-07 \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
 \section{Bug Reports — Feature C}
+Năm lỗi ứng viên dưới đây suy ra từ phân tích mã nguồn; cần \textbf{xác nhận bằng thực thi},
+chụp màn hình và tạo GitHub Issue trước khi nộp.
+% BUGS-C-HERE
 
 % ============================================================
 %  CHƯƠNG 5: FEATURE D — POOL D (MOBILE)
