@@ -858,6 +858,110 @@ lỗi off-by-one biên (BUG-B-02). Biên \texttt{max\_uses\_per\_user} lại dù
     \end{tabularx}
 \end{table}
 
+\section{Bug Reports — Feature B}
+Năm lỗi ứng viên dưới đây suy ra từ phân tích mã nguồn; cần \textbf{xác nhận bằng thực thi},
+chụp màn hình và tạo GitHub Issue trước khi nộp.
+
+\subsection{BUG-B-01: Mã giảm giá phần trăm tính sai, làm tăng giá $\sim$10 lần}
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\linewidth}{L{3cm} X}
+        \toprule
+        \textbf{Trường} & \textbf{Nội dung} \\
+        \midrule
+        Bug ID       & BUG-B-01 \\
+        Tính năng    & FR-09 \quad\textbf{Kỹ thuật:} Domain \\
+        Mức độ       & Critical \\
+        Mô tả        & Công thức \texttt{floor(total\_amount $\times$ (1 $-$ discount\_value))} sai: \texttt{discount\_value} là số nguyên (10 = 10\%), khiến \texttt{discount\_amount} âm và \texttt{final\_amount} lớn gấp $\sim$10 lần đơn gốc. \\
+        Tái hiện     & 1. Thêm hàng để tổng $=400.000$. \newline 2. Nhập mã \texttt{SAVE10}. \newline 3. Bấm áp dụng. \\
+        Expected     & Giảm 40.000, còn 360.000. \\
+        Actual       & \texttt{discount\_amount} $=-3.600.000$, \texttt{final\_amount} $=4.000.000$ (dự đoán từ nguồn). \\
+        GitHub Issue & \url{https://github.com/[group]/eshop-sut/issues/[number]} \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+% \begin{figure}[H]\centering\includegraphics[width=0.8\linewidth]{bug_b_01.png}\caption{Screenshot — BUG-B-01}\end{figure}
+
+\subsection{BUG-B-02: Đơn bằng đúng mức tối thiểu bị từ chối (off-by-one)}
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\linewidth}{L{3cm} X}
+        \toprule
+        \textbf{Trường} & \textbf{Nội dung} \\
+        \midrule
+        Bug ID       & BUG-B-02 \\
+        Tính năng    & FR-09 \quad\textbf{Kỹ thuật:} BVA \\
+        Mức độ       & Minor \\
+        Mô tả        & Điều kiện \texttt{total\_amount > min\_order\_amount} dùng \texttt{>} thay vì \texttt{>=}; đơn bằng đúng mức tối thiểu bị từ chối. \\
+        Tái hiện     & 1. Đặt tổng đơn $=300.000$. \newline 2. Nhập mã \texttt{VIP100} (min 300.000). \newline 3. Áp dụng. \\
+        Expected     & Chấp nhận (đơn đủ mức tối thiểu), final 200.000. \\
+        Actual       & 400 ``Đơn hàng chưa đủ giá trị tối thiểu\ldots'' (dự đoán từ nguồn). \\
+        GitHub Issue & \url{https://github.com/[group]/eshop-sut/issues/[number]} \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+% \begin{figure}[H]\centering\includegraphics[width=0.8\linewidth]{bug_b_02.png}\caption{Screenshot — BUG-B-02}\end{figure}
+
+\subsection{BUG-B-03: Bỏ qua giới hạn số lần dùng khi thiếu user\_id}
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\linewidth}{L{3cm} X}
+        \toprule
+        \textbf{Trường} & \textbf{Nội dung} \\
+        \midrule
+        Bug ID       & BUG-B-03 \\
+        Tính năng    & FR-09 \quad\textbf{Kỹ thuật:} Domain \\
+        Mức độ       & Major \\
+        Mô tả        & Kiểm tra \texttt{max\_uses\_per\_user} chỉ chạy trong nhánh \texttt{if (user\_id)}; nếu không gửi \texttt{user\_id}, kiểm tra bị bỏ qua và mã dùng được không giới hạn. \\
+        Tái hiện     & 1. Dùng \texttt{VIP100} đủ 2 lần (đạt giới hạn). \newline 2. Gọi \texttt{apply-coupon} \emph{không} kèm \texttt{user\_id}. \\
+        Expected     & 400 ``đã đạt giới hạn''. \\
+        Actual       & Áp dụng thành công (dự đoán từ nguồn). \\
+        GitHub Issue & \url{https://github.com/[group]/eshop-sut/issues/[number]} \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+% \begin{figure}[H]\centering\includegraphics[width=0.8\linewidth]{bug_b_03.png}\caption{Screenshot — BUG-B-03}\end{figure}
+
+\subsection{BUG-B-04: apply-coupon không xác thực, tin user\_id từ client}
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\linewidth}{L{3cm} X}
+        \toprule
+        \textbf{Trường} & \textbf{Nội dung} \\
+        \midrule
+        Bug ID       & BUG-B-04 \\
+        Tính năng    & FR-09 \quad\textbf{Kỹ thuật:} Domain \\
+        Mức độ       & Major \\
+        Mô tả        & \texttt{POST /api/apply-coupon} không có middleware \texttt{authenticateToken}; \texttt{user\_id} lấy trực tiếp từ body nên có thể giả mạo hoặc bỏ trống để né giới hạn dùng. \\
+        Tái hiện     & 1. Gọi \texttt{apply-coupon} với \texttt{user\_id} bất kỳ (không token). \newline 2. Quan sát mã vẫn áp dụng. \\
+        Expected     & Xác thực token, lấy \texttt{user\_id} từ token. \\
+        Actual       & Chấp nhận \texttt{user\_id} tùy client (dự đoán từ nguồn). \\
+        GitHub Issue & \url{https://github.com/[group]/eshop-sut/issues/[number]} \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+% \begin{figure}[H]\centering\includegraphics[width=0.8\linewidth]{bug_b_04.png}\caption{Screenshot — BUG-B-04}\end{figure}
+
+\subsection{BUG-B-05: Không chặn final\_amount âm với mã fixed}
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\linewidth}{L{3cm} X}
+        \toprule
+        \textbf{Trường} & \textbf{Nội dung} \\
+        \midrule
+        Bug ID       & BUG-B-05 \\
+        Tính năng    & FR-09 \quad\textbf{Kỹ thuật:} BVA \\
+        Mức độ       & Minor \\
+        Mô tả        & Với mã \texttt{fixed}, \texttt{discount\_amount = discount\_value} không bị chặn theo \texttt{total\_amount}; nếu số tiền giảm gần bằng tổng đơn, \texttt{final\_amount} có thể còn $\approx 0$ hoặc âm, không có kẹp $\ge 0$. \\
+        Tái hiện     & 1. Dùng mã fixed có \texttt{discount\_value} gần bằng tổng đơn (vd giảm 100.000 cho đơn 100.001). \\
+        Expected     & \texttt{final\_amount} được kẹp $\ge 0$ và hợp lý. \\
+        Actual       & \texttt{final\_amount} $\approx 1$ (không kẹp; dự đoán từ nguồn). \\
+        GitHub Issue & \url{https://github.com/[group]/eshop-sut/issues/[number]} \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+% \begin{figure}[H]\centering\includegraphics[width=0.8\linewidth]{bug_b_05.png}\caption{Screenshot — BUG-B-05}\end{figure}
+
 % ============================================================
 %  CHƯƠNG 4: FEATURE C — POOL C
 % ============================================================
