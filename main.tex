@@ -278,16 +278,24 @@ lỗi (bug).
 \section{Domain Testing}
 
 \subsection{Bước 1: Xác Định Các Biến Đầu Vào}
-% TODO: Liệt kê tất cả biến đầu vào (input variables)
+Liệt kê mọi biến đầu vào (kể cả biến ẩn: độ dài mật khẩu, các lớp ký tự, tính duy nhất của
+email).
+
 \begin{table}[H]
     \centering
-    \caption{Danh sách biến đầu vào — Feature A}
-    \begin{tabularx}{\linewidth}{C{0.5cm} L{3cm} L{3cm} L{3cm} L{4cm}}
+    \caption{Danh sách biến đầu vào — Feature A (FR-01)}
+    \begin{tabularx}{\linewidth}{C{0.5cm} L{3cm} L{2.4cm} L{3.2cm} X}
         \toprule
         \textbf{\#} & \textbf{Biến} & \textbf{Kiểu dữ liệu} & \textbf{Ràng buộc} & \textbf{Ghi chú} \\
         \midrule
-        1 & [Biến 1] & [String/Int/...] & [ràng buộc] & \\
-        2 & [Biến 2] & & & \\
+        1 & name & string (TEXT) & UI \texttt{required} & Không giới hạn độ dài/định dạng; backend không kiểm. \\
+        2 & email & string (TEXT) & UI \texttt{required} & \texttt{type="text"} nên không kiểm định dạng; cột \emph{không} \texttt{UNIQUE}. \\
+        3 & password & string (TEXT) & regex client & Backend không kiểm; lưu plaintext. \\
+        4 & password.length & integer (ẩn) & $\ge 8$ (regex \texttt{\{8,\}}) & Biến có thứ tự $\Rightarrow$ dùng cho BVA. \\
+        5 & has\_lower / has\_upper / has\_digit & boolean (ẩn) & phải có mỗi loại & Điều kiện lớp ký tự của regex. \\
+        6 & has\_whitespace & boolean (ẩn) & regex \emph{bắt buộc} & Khiếm khuyết (đặc tả không yêu cầu). \\
+        7 & has\_special\_char & boolean (ẩn) & regex \emph{cấm} & Khiếm khuyết (đặc tả \emph{yêu cầu}). \\
+        8 & email.isUnique & boolean (ẩn) & phải duy nhất & Không nơi nào kiểm tra. \\
         \bottomrule
     \end{tabularx}
 \end{table}
