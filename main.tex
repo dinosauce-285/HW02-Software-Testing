@@ -611,25 +611,252 @@ thi}, chụp màn hình (đặt tại \texttt{figures/} hoặc \texttt{screensho
 % ============================================================
 %  CHƯƠNG 3: FEATURE B — POOL B
 % ============================================================
-\chapter{Feature B — [Tên tính năng] (Pool B)}
+\chapter{Feature B — Mã giảm giá (Pool B)}
 
 \section{Mô Tả Tính Năng}
-% TODO
+Tính năng \textbf{FR-09 — Mã giảm giá} cho phép người dùng nhập một mã (\texttt{code})
+để giảm giá cho đơn hàng có tổng tiền \texttt{total\_amount}. Logic cốt lõi nằm ở API
+\texttt{POST /api/apply-coupon} (\texttt{backend/server.js}); dữ liệu mã lưu ở bảng
+\texttt{coupons} (\texttt{backend/database.js}).
+
+\begin{itemize}
+    \item \textbf{Bảng \texttt{coupons}:} \texttt{code} (UNIQUE), \texttt{type}
+    (\texttt{'percent'}/\texttt{'fixed'}), \texttt{discount\_value} (INTEGER),
+    \texttt{min\_order\_amount} (INTEGER), \texttt{expired\_at} (DATETIME),
+    \texttt{is\_active} (0/1), \texttt{max\_uses\_per\_user} (INTEGER).
+    \item \textbf{API \texttt{apply-coupon}:} nhận \verb|{code, total_amount, user_id}|.
+    Tìm mã đang \texttt{is\_active=1}; nếu \texttt{total\_amount > min\_order\_amount} thì
+    kiểm tra hạn dùng, kiểm tra số lần dùng (chỉ khi có \texttt{user\_id}), rồi tính
+    \texttt{discount\_amount} và \texttt{final\_amount}.
+    \item \textbf{Các mã mẫu (seed):} \texttt{SAVE10} (percent 10, min 300k),
+    \texttt{BIGBUY} (fixed 50k, min 500k), \texttt{VIP100} (fixed 100k, min 300k, tối đa 2 lần),
+    \texttt{EXPIRED} (percent 20, hết hạn 2020).
+\end{itemize}
+
+\noindent\textbf{Đầu vào:} \texttt{code} (string), \texttt{total\_amount} (số, ₫),
+\texttt{user\_id} (số hoặc vắng).\\
+\textbf{Đầu ra:} mã HTTP, \texttt{discount\_amount}, \texttt{final\_amount}, thông báo.
+
+\vspace{4pt}
+\noindent\textbf{Công thức tính giảm giá theo mã nguồn:}
+\begin{lstlisting}[caption={Tính discount trong apply-coupon (server.js)},numbers=none]
+if (total_amount > coupon.min_order_amount) { ... }        // (A) dùng '>'
+if (coupon.type === "percent")
+    discount_amount = Math.floor(total_amount * (1 - coupon.discount_value)); // (B)
+else
+    discount_amount = coupon.discount_value;
+final_amount = total_amount - discount_amount;
+\end{lstlisting}
+
+\begin{notebox}
+Hai khiếm khuyết trọng tâm của chương này: \textbf{(A)} dùng toán tử \texttt{>} nên đơn hàng
+\emph{bằng đúng} \texttt{min\_order\_amount} bị từ chối (lỗi off-by-one biên). \textbf{(B)}
+\texttt{discount\_value} của mã \texttt{percent} lưu dạng số nguyên (\texttt{10} nghĩa là 10\%),
+nhưng công thức lại là \texttt{total\_amount $\times$ (1 $-$ discount\_value)}. Với
+\texttt{SAVE10} (10\%) trên đơn 400.000\,₫: đáng lẽ giảm 40.000 (còn 360.000), nhưng mã tính
+\texttt{floor(400000 $\times$ (1$-$10)) $= -3.600.000$}, khiến \texttt{final\_amount $=
+400000 - (-3.600.000) = 4.000.000$} — \emph{đắt gấp 10 lần}. Công thức chỉ đúng cho mã
+\texttt{fixed}.
+\end{notebox}
+
+\begin{notebox}
+\textbf{Quy ước cột kết quả} (như Feature A): cột \emph{Kết quả}/\emph{Trạng thái} ghi giá trị
+\textbf{dự đoán từ phân tích mã nguồn}, cần xác nhận lại khi chạy thật + chụp màn hình. Cột
+\emph{Expected} là hành vi \emph{đúng theo đặc tả}.
+\end{notebox}
 
 \section{Domain Testing}
-\subsection{Bước 1: Xác Định Các Biến Đầu Vào}
-\subsection{Bước 2: Phân Hoạch Miền}
-\subsection{Bước 3: Chọn Điểm Kiểm Thử}
-\subsection{Bước 4: Thiết Kế Test Cases — Domain Testing}
-% TODO: Copy bảng từ chương 2, đổi prefix TC-B-DT-
 
-\section{Boundary Value Analysis}
+\subsection{Bước 1: Xác Định Các Biến Đầu Vào}
+\begin{table}[H]
+    \centering
+    \caption{Danh sách biến — Feature B (FR-09)}
+    \begin{tabularx}{\linewidth}{C{0.5cm} L{3cm} L{2.6cm} C{1.8cm} X}
+        \toprule
+        \textbf{\#} & \textbf{Biến} & \textbf{Kiểu} & \textbf{Vào/Ra} & \textbf{Ghi chú} \\
+        \midrule
+        1 & code & string & Input & Bắt buộc; so khớp phân biệt hoa/thường (SQLite BINARY). \\
+        2 & total\_amount & integer (₫) & Input & Biến có thứ tự $\Rightarrow$ biên tại \texttt{min\_order\_amount}. \\
+        3 & user\_id & integer / vắng & Input & Quyết định có kiểm tra số lần dùng hay không. \\
+        4 & coupon.type & enum & Dữ liệu mã & \texttt{percent} (công thức sai) vs \texttt{fixed} (đúng). \\
+        5 & coupon.discount\_value & integer & Dữ liệu mã & percent: 10 = 10\%; fixed: số tiền ₫. \\
+        6 & coupon.min\_order\_amount & integer & Dữ liệu mã & Biên (so bằng \texttt{>}). \\
+        7 & coupon.expired\_at & date & Dữ liệu mã & Biên so với \emph{now}. \\
+        8 & coupon.max\_uses\_per\_user & integer & Dữ liệu mã & Biên số lần dùng (\texttt{>=}). \\
+        9 & coupon.is\_active & boolean & Dữ liệu mã & \texttt{0} $\Rightarrow$ coi như không tồn tại. \\
+        10 & discount\_amount / final\_amount & integer & \textbf{Output} & Biên đầu ra: không âm, final $\ge 0$. \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\subsection{Bước 2: Phân Hoạch Miền}
+Dấu \emph{*} đánh dấu lớp mà một hệ thống \emph{đúng} phải xử lý theo đặc tả nhưng mã hiện tại
+xử lý sai.
+
+\subsubsection{Biến code}
+\begin{table}[H]
+    \centering
+    \caption{Phân hoạch miền — code}
+    \begin{tabularx}{\linewidth}{C{1.4cm} L{6cm} C{1.6cm} X}
+        \toprule
+        \textbf{EC} & \textbf{Điều kiện} & \textbf{Loại} & \textbf{Ví dụ} \\
+        \midrule
+        EC-C1 & Mã tồn tại, đang \texttt{is\_active=1} & Valid & \texttt{SAVE10} \\
+        EC-C2 & Mã không tồn tại & Invalid & \texttt{NOPE99} \\
+        EC-C3 & Rỗng / thiếu trường & Invalid & \verb|""| \\
+        EC-C4 & Mã tồn tại nhưng \texttt{is\_active=0} & Invalid & (mã bị vô hiệu) \\
+        EC-C5 & Đúng mã nhưng khác hoa/thường & Invalid* & \texttt{save10} \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\subsubsection{Biến total\_amount (so với \texttt{min\_order\_amount})}
+\begin{table}[H]
+    \centering
+    \caption{Phân hoạch miền — total\_amount (mã VIP100, min = 300.000)}
+    \begin{tabularx}{\linewidth}{C{1.4cm} L{6cm} C{1.6cm} X}
+        \toprule
+        \textbf{EC} & \textbf{Điều kiện} & \textbf{Loại} & \textbf{Ví dụ} \\
+        \midrule
+        EC-T1 & \texttt{total > min} & Valid & 300.001 \\
+        EC-T2 & \texttt{total = min} (đúng biên) & Valid* & 300.000 \\
+        EC-T3 & \texttt{total < min} & Invalid & 299.999 \\
+        EC-T4 & Âm hoặc 0 & Invalid & \texttt{-100} \\
+        EC-T5 & Thiếu / không phải số & Invalid & \texttt{undefined} \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\subsubsection{Biến user\_id \& loại mã}
+\begin{table}[H]
+    \centering
+    \caption{Phân hoạch miền — user\_id, type, expiry}
+    \begin{tabularx}{\linewidth}{C{1.4cm} L{6.5cm} C{1.6cm} X}
+        \toprule
+        \textbf{EC} & \textbf{Điều kiện} & \textbf{Loại} & \textbf{Ví dụ} \\
+        \midrule
+        EC-U1 & Có \texttt{user\_id}, chưa đạt \texttt{max\_uses} & Valid & dùng lần 1/2 \\
+        EC-U2 & Có \texttt{user\_id}, đã đạt \texttt{max\_uses} & Invalid & dùng lần 3 (VIP100) \\
+        EC-U3 & \emph{Vắng} \texttt{user\_id} $\Rightarrow$ bỏ qua kiểm tra & Invalid* & không gửi \texttt{user\_id} \\
+        EC-Y1 & Loại \texttt{fixed} & Valid & VIP100/BIGBUY \\
+        EC-Y2 & Loại \texttt{percent} (công thức sai) & Valid* & SAVE10 \\
+        EC-X1 & Còn hạn & Valid & \texttt{2099-12-31} \\
+        EC-X2 & Hết hạn & Invalid & EXPIRED (2020) \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\subsection{Bước 3: Chọn Điểm Kiểm Thử (ON/OFF/IN/OUT)}
+Biên số học rõ ràng nhất là \texttt{total\_amount} tại \texttt{min\_order\_amount}. Dùng mã
+\textbf{VIP100} (\texttt{fixed} 100.000, min 300.000) để cô lập biên chấp nhận/từ chối, tránh
+để lỗi công thức percent làm nhiễu.
+
+\begin{table}[H]
+    \centering
+    \caption{Điểm ON/OFF/IN/OUT — total\_amount (min = 300.000)}
+    \begin{tabularx}{\linewidth}{L{2.4cm} C{2.4cm} X}
+        \toprule
+        \textbf{Loại điểm} & \textbf{Giá trị} & \textbf{Kỳ vọng (đặc tả)} \\
+        \midrule
+        ON-point  & 300.000 & Chấp nhận (đơn đủ mức tối thiểu) \\
+        OFF-point & 299.999 & Từ chối (dưới mức tối thiểu) \\
+        IN-point  & 400.000 & Chấp nhận \\
+        OUT-point & 0       & Từ chối \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\noindent\textbf{Nhận xét:} do mã dùng \texttt{total\_amount > min} (toán tử \texttt{>}),
+\emph{ON-point} 300.000 bị \emph{từ chối} trong khi đặc tả yêu cầu \emph{chấp nhận} — đây là
+lỗi off-by-one biên (BUG-B-02). Biên \texttt{max\_uses\_per\_user} lại dùng \texttt{>=} nên
+được cài đặt \emph{đúng} (sẽ Pass), ngoại trừ lỗ hổng bỏ qua khi vắng \texttt{user\_id}.
+
+\subsection{Bước 4: Thiết Kế Test Cases — Domain Testing}
+\begin{longtable}{C{1.1cm} L{3.1cm} L{3.2cm} L{3cm} C{2cm} C{1.4cm}}
+    \caption{Test cases — Domain Testing, Feature B} \\
+    \toprule
+    \textbf{TC\#} & \textbf{Mô tả} & \textbf{Input} & \textbf{Expected Output} & \textbf{Kết quả} & \textbf{Trạng thái} \\
+    \midrule
+    \endfirsthead
+    \multicolumn{6}{c}{\small\itshape (tiếp theo)} \\
+    \toprule
+    \textbf{TC\#} & \textbf{Mô tả} & \textbf{Input} & \textbf{Expected Output} & \textbf{Kết quả} & \textbf{Trạng thái} \\
+    \midrule
+    \endhead
+    \midrule
+    \multicolumn{6}{r}{\small\itshape (còn tiếp)} \\
+    \endfoot
+    \bottomrule
+    \endlastfoot
+    TC-B-DT-01 & Mã percent hợp lệ \newline (BUG-B-01) & SAVE10, total=400.000 & discount 40.000, final 360.000 & discount $-3.600.000$, final 4.000.000 & \textcolor{red}{Fail} \\
+    TC-B-DT-02 & Mã fixed hợp lệ & BIGBUY, total=600.000 & discount 50.000, final 550.000 & Như expected & \textcolor{green!60!black}{Pass} \\
+    TC-B-DT-03 & Mã fixed hợp lệ & VIP100, total=400.000 & discount 100.000, final 300.000 & Như expected & \textcolor{green!60!black}{Pass} \\
+    TC-B-DT-04 & Mã không tồn tại & NOPE99, total=400.000 & 404 không tồn tại & 404 & \textcolor{green!60!black}{Pass} \\
+    TC-B-DT-05 & Thiếu mã & code=\verb|""| & 400 ``Vui lòng nhập mã'' & 400 & \textcolor{green!60!black}{Pass} \\
+    TC-B-DT-06 & Mã hết hạn & EXPIRED, total=200.000 & 400 ``đã hết hạn'' & 400 & \textcolor{green!60!black}{Pass} \\
+    TC-B-DT-07 & total = min (đúng biên) \newline (BUG-B-02) & VIP100, total=300.000 & Chấp nhận (final 200.000) & 400 ``chưa đủ giá trị'' & \textcolor{red}{Fail} \\
+    TC-B-DT-08 & Đạt giới hạn số lần dùng & VIP100, user\_id=U, đã dùng 2 lần & 400 ``đã đạt giới hạn'' & 400 & \textcolor{green!60!black}{Pass} \\
+    TC-B-DT-09 & Bỏ qua giới hạn khi vắng user\_id \newline (BUG-B-03) & VIP100, \emph{không} gửi user\_id, đã dùng 2 lần & 400 ``đã đạt giới hạn'' & Áp dụng OK (bỏ kiểm tra) & \textcolor{red}{Fail} \\
+    TC-B-DT-10 & Không xác thực, giả mạo user\_id \newline (BUG-B-04) & apply-coupon với user\_id tùy ý (không token) & Lấy user từ token & Tin user\_id trong body & \textcolor{red}{Fail} \\
+    TC-B-DT-11 & Mã khác hoa/thường & \texttt{save10}, total=400.000 & Tùy đặc tả (nên không phân biệt) & 404 không tồn tại & \textcolor{orange}{Note} \\
+    TC-B-DT-12 & fixed vượt tổng đơn \newline (BUG-B-05) & mã fixed 100.000, total=100.001 (min 100.000) & final $\ge 0$, có chặn & final $\approx 1$ (không chặn) & \textcolor{red}{Fail} \\
+\end{longtable}
+
+\section{Boundary Value Analysis (BVA)}
+
 \subsection{Bước 1: Xác Định Ranh Giới}
+\begin{table}[H]
+    \centering
+    \caption{Bảng giá trị biên — Feature B (FR-09)}
+    \begin{tabularx}{\linewidth}{L{3.4cm} C{1.8cm} C{1.8cm} C{1.8cm} X}
+        \toprule
+        \textbf{Biên} & \textbf{Off} & \textbf{On} & \textbf{On+1} & \textbf{Ghi chú} \\
+        \midrule
+        total\_amount vs min (VIP100=300k) & 299.999 & 300.000 & 300.001 & On bị từ chối (dùng \texttt{>}) $\Rightarrow$ lỗi. \\
+        max\_uses\_per\_user (VIP100=2) & 1 lần & 2 lần & 3 lần & Dùng \texttt{>=}, cài đặt đúng. \\
+        expired\_at vs now & quá khứ & --- & tương lai & So sánh \texttt{expiry < now} đúng. \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
 \subsection{Bước 2: Thiết Kế Test Cases — BVA}
-% TODO: Copy bảng từ chương 2, đổi prefix TC-B-BV-
+\begin{longtable}{C{1.1cm} L{3.2cm} L{3.2cm} L{3cm} C{2cm} C{1.4cm}}
+    \caption{Test cases — BVA, Feature B} \\
+    \toprule
+    \textbf{TC\#} & \textbf{Mô tả} & \textbf{Input} & \textbf{Expected Output} & \textbf{Kết quả} & \textbf{Trạng thái} \\
+    \midrule
+    \endfirsthead
+    \toprule
+    \textbf{TC\#} & \textbf{Mô tả} & \textbf{Input} & \textbf{Expected Output} & \textbf{Kết quả} & \textbf{Trạng thái} \\
+    \midrule
+    \endhead
+    \bottomrule
+    \endlastfoot
+    TC-B-BV-01 & min$-1$: dưới biên & VIP100, total=299.999 & Từ chối (chưa đủ) & Từ chối & \textcolor{green!60!black}{Pass} \\
+    TC-B-BV-02 & min: đúng biên \newline (BUG-B-02) & VIP100, total=300.000 & Chấp nhận, final 200.000 & Từ chối ``chưa đủ'' & \textcolor{red}{Fail} \\
+    TC-B-BV-03 & min$+1$: trên biên & VIP100, total=300.001 & Chấp nhận, final 200.001 & Chấp nhận & \textcolor{green!60!black}{Pass} \\
+    TC-B-BV-04 & max$-1$ lần dùng & VIP100, user\_id=U, đã dùng 1 & Chấp nhận & Chấp nhận & \textcolor{green!60!black}{Pass} \\
+    TC-B-BV-05 & max lần dùng (đúng biên) & VIP100, user\_id=U, đã dùng 2 & Từ chối ``đạt giới hạn'' & Từ chối & \textcolor{green!60!black}{Pass} \\
+    TC-B-BV-06 & Biên hạn dùng & EXPIRED (quá khứ) vs SAVE10 (tương lai) & Quá khứ từ chối, tương lai nhận & Đúng như vậy & \textcolor{green!60!black}{Pass} \\
+\end{longtable}
 
 \section{AI Gap Analysis}
-\section{Bug Reports — Feature B}
+\begin{table}[H]
+    \centering
+    \caption{AI Gap Analysis — Feature B (FR-09)}
+    \begin{tabularx}{\linewidth}{C{0.5cm} X L{4cm} C{1.8cm}}
+        \toprule
+        \textbf{\#} & \textbf{Ca/bug bị bỏ sót} & \textbf{Lý do bỏ sót} & \textbf{Bổ sung ở TC} \\
+        \midrule
+        1 & Công thức percent sai (\texttt{1$-$discount\_value}) làm giá tăng gấp $\sim$10 lần — cần đọc \emph{phép tính thực tế}, không chỉ tên biến. & Giới hạn công cụ + độ phức tạp (biến \emph{đầu ra}, không phải input). & TC-B-DT-01 \\
+        2 & Off-by-one biên \texttt{min\_order\_amount} (\texttt{>} thay vì \texttt{>=}) — chỉ lộ khi thử \emph{đúng} giá trị biên. & Chất lượng prompt (không yêu cầu thử ca ``bằng đúng biên''). & TC-B-DT-07, BV-02 \\
+        3 & Bỏ qua giới hạn số lần dùng khi \emph{vắng} \texttt{user\_id} (nhánh else). & Độ phức tạp nội tại (phụ thuộc luồng điều khiển/nhánh). & TC-B-DT-09 \\
+        4 & \texttt{apply-coupon} không có \texttt{authenticateToken}; tin \texttt{user\_id} từ body $\Rightarrow$ giả mạo/bỏ giới hạn. & Giới hạn công cụ (AI tập trung input, bỏ sót thiếu middleware). & TC-B-DT-10 \\
+        5 & Không chặn \texttt{final\_amount} âm / \texttt{discount > total} với mã fixed. & Độ phức tạp (biên đầu ra + tổ hợp hiếm). & TC-B-DT-12 \\
+        6 & So khớp \texttt{code} phân biệt hoa/thường (SQLite BINARY) — \texttt{save10} $\ne$ \texttt{SAVE10}. & Độ phức tạp (locale/encoding, hành vi ngầm của SQLite). & TC-B-DT-11 \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
 
 % ============================================================
 %  CHƯƠNG 4: FEATURE C — POOL C
