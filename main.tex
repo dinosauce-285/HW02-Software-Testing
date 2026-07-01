@@ -1,0 +1,574 @@
+% ============================================================
+%  HW02 – Domain Testing on EShop | Report Template
+% ============================================================
+\documentclass[12pt, a4paper]{report}
+
+% ---------- Encoding & Language ----------
+\usepackage[utf8]{inputenc}
+\usepackage[T5]{fontenc}
+\usepackage[vietnamese, english]{babel}
+
+% ---------- Page Layout ----------
+\usepackage[
+    top=2.5cm, bottom=2.5cm,
+    left=3cm,  right=2.5cm
+]{geometry}
+
+% ---------- Typography ----------
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{setspace}
+\onehalfspacing
+
+% ---------- Colors ----------
+\usepackage[dvipsnames, table]{xcolor}
+\definecolor{primaryblue}{RGB}{68, 114, 196}   % headerblue từ style của sinh viên
+\definecolor{headerblue}{RGB}{68, 114, 196}
+\definecolor{lightgray}{RGB}{242, 242, 242}     % lightgray từ style của sinh viên
+\definecolor{pastelgreen}{RGB}{220, 245, 220}
+\definecolor{pastelred}{RGB}{255, 220, 220}
+\definecolor{pastelyellow}{RGB}{255, 248, 220}
+
+% ---------- Math ----------
+\usepackage{amsmath, amssymb}
+
+% ---------- Tables ----------
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{array}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
+
+% ---------- Graphics ----------
+\usepackage{graphicx}
+\usepackage{float}
+\graphicspath{{./figures/}}
+
+% ---------- Listings (Code) ----------
+\usepackage{listings}
+\lstset{
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{primaryblue}\bfseries,
+    commentstyle=\color{gray}\itshape,
+    stringstyle=\color{BrickRed},
+    backgroundcolor=\color{lightgray},
+    frame=single,
+    rulecolor=\color{gray!40},
+    breaklines=true,
+    showstringspaces=false,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    tabsize=4,
+    captionpos=b
+}
+
+% ---------- Hyperlinks ----------
+\usepackage[
+    colorlinks=true,
+    linkcolor=primaryblue,
+    urlcolor=primaryblue,
+    citecolor=primaryblue,
+    pdftitle={HW02 – Domain Testing on EShop},
+    pdfauthor={Lý Quốc Thạnh},
+    pdfsubject={Software Testing}
+]{hyperref}
+
+% ---------- Headers & Footers ----------
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textcolor{gray}{\subjectName}}
+\fancyhead[R]{\small\textcolor{gray}{\hwTitle}}
+\fancyfoot[C]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% ---------- Section Styling ----------
+\usepackage{titlesec}
+\titleformat{\chapter}[block]
+    {\normalfont\LARGE\bfseries\color{primaryblue}}
+    {\thechapter.}{1em}{}
+\titleformat{\section}
+    {\normalfont\Large\bfseries\color{primaryblue!80}}
+    {\thesection}{1em}{}
+\titleformat{\subsection}
+    {\normalfont\large\bfseries}
+    {\thesubsection}{1em}{}
+\titleformat{\subsubsection}
+    {\normalfont\normalsize\bfseries}
+    {\thesubsubsection}{1em}{}
+
+% ---------- Captions ----------
+\usepackage{caption}
+\captionsetup{
+    font=small,
+    labelfont={bf, color=primaryblue},
+    skip=6pt
+}
+
+% ---------- Enumitem ----------
+\usepackage{enumitem}
+\setlist[itemize]{leftmargin=*, topsep=4pt, itemsep=2pt}
+\setlist[enumerate]{leftmargin=*, topsep=4pt, itemsep=2pt}
+
+% ---------- Boxes & Notes ----------
+\usepackage{tcolorbox}
+\tcbuselibrary{skins, breakable}
+\newtcolorbox{notebox}[1][]{
+    colback=pastelyellow, colframe=orange!60,
+    title={\textbf{Note}}, fonttitle=\bfseries,
+    #1
+}
+\newtcolorbox{bugbox}[1][]{
+    colback=pastelred, colframe=red!60,
+    title={\textbf{Bug}}, fonttitle=\bfseries,
+    #1
+}
+\newtcolorbox{passbox}[1][]{
+    colback=pastelgreen, colframe=green!60,
+    title={\textbf{Pass}}, fonttitle=\bfseries,
+    #1
+}
+
+% ---------- Metadata ----------
+\newcommand{\subjectName}{KIỂM CHỨNG PHẦN MỀM}
+\newcommand{\hwTitle}{HW02 – Domain Testing on EShop}
+\newcommand{\instructor}{%
+    \begin{tabular}[t]{@{}l@{}}
+        Lâm Quang Vũ \\
+        Trương Phước Lộc \\
+        Hồ Tuấn Thanh
+    \end{tabular}%
+}
+\newcommand{\studentName}{Lý Quốc Thạnh}
+\newcommand{\studentID}{23127262}
+\newcommand{\studentEmail}{lqthanh23@clc.fitus.edu.vn}
+
+% ============================================================
+\begin{document}
+
+% ===== TRANG BÌA =====
+\begin{titlepage}
+    \centering
+    \vspace*{1cm}
+    \textbf{\Large TRƯỜNG ĐẠI HỌC KHOA HỌC TỰ NHIÊN}\\
+    \textbf{\large KHOA CÔNG NGHỆ THÔNG TIN}\\
+    \vspace{3cm}
+    {\LARGE \textbf{\subjectName}}\\[2cm]
+    {\LARGE \textbf{\hwTitle}}\\[2cm]
+    \vspace{1.5cm}
+    \begin{table}[h]
+        \centering
+        \large
+        \begin{tabular}{ll}
+            \textbf{Giảng viên:}  & \instructor \\[0.5cm]
+            \textbf{Sinh viên:}   & \studentName \\
+            \textbf{MSSV:}        & \studentID \\
+            \textbf{Email:}       & \studentEmail \\
+        \end{tabular}
+    \end{table}
+    \vfill
+    {\large TP. Hồ Chí Minh, \today}
+\end{titlepage}
+
+% ===== MỤC LỤC =====
+\tableofcontents
+\listoffigures
+\listoftables
+\newpage
+
+% ============================================================
+%  CHƯƠNG 1: TỔNG QUAN
+% ============================================================
+\chapter{Tổng Quan}
+
+\section{Thông Tin Bài Tập}
+\begin{table}[H]
+    \centering
+    \caption{Thông tin chung HW02}
+    \begin{tabularx}{\linewidth}{lX}
+        \toprule
+        \textbf{Trường}        & \textbf{Nội dung} \\
+        \midrule
+        Exercise ID            & HW02-AI \\
+        Thời lượng             & 10 giờ \\
+        Hình thức              & Cá nhân \\
+        AI Policy              & Open — bắt buộc khai báo + AI Audit Report \\
+        Bloom-AI Level         & G9.2 (Apply) và G9.3 (Analyse) \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\section{Hệ Thống Kiểm Thử (SUT)}
+\begin{itemize}
+    \item \textbf{Tên SUT:} EShop — ứng dụng thương mại điện tử demo tiếng Việt.
+    \item \textbf{Repository:} \url{https://github.com/ttbhanh/eshop-sut}
+\end{itemize}
+
+\section{Các Tính Năng Được Chọn}
+% TODO: Điền 4 tính năng bạn đã chọn (mỗi Pool 1 tính năng)
+\begin{table}[H]
+    \centering
+    \caption{Tính năng được chọn}
+    \begin{tabularx}{\linewidth}{C{1.5cm} C{2cm} L{4cm} L{6cm}}
+        \toprule
+        \textbf{Pool} & \textbf{FR-ID} & \textbf{Tên tính năng} & \textbf{Mô tả} \\
+        \midrule
+        A & FR-0x & [Tên tính năng A] & [Mô tả ngắn] \\
+        B & FR-0x & [Tên tính năng B] & [Mô tả ngắn] \\
+        C & FR-xx & [Tên tính năng C] & [Mô tả ngắn] \\
+        D & ---   & [Tính năng Mobile] & [Mô tả ngắn] \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+% ============================================================
+%  CHƯƠNG 2: FEATURE A — POOL A
+% ============================================================
+\chapter{Feature A — [Tên tính năng] (Pool A)}
+
+\section{Mô Tả Tính Năng}
+% TODO: Mô tả chi tiết tính năng, input/output, constraints
+
+\section{Domain Testing}
+
+\subsection{Bước 1: Xác Định Các Biến Đầu Vào}
+% TODO: Liệt kê tất cả biến đầu vào (input variables)
+\begin{table}[H]
+    \centering
+    \caption{Danh sách biến đầu vào — Feature A}
+    \begin{tabularx}{\linewidth}{C{0.5cm} L{3cm} L{3cm} L{3cm} L{4cm}}
+        \toprule
+        \textbf{\#} & \textbf{Biến} & \textbf{Kiểu dữ liệu} & \textbf{Ràng buộc} & \textbf{Ghi chú} \\
+        \midrule
+        1 & [Biến 1] & [String/Int/...] & [ràng buộc] & \\
+        2 & [Biến 2] & & & \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\subsection{Bước 2: Phân Hoạch Miền (Domain Partitioning)}
+% TODO: Với mỗi biến, xác định các miền hợp lệ/không hợp lệ
+\subsubsection{Biến 1: [Tên biến]}
+\begin{table}[H]
+    \centering
+    \caption{Phân hoạch miền — Biến 1}
+    \begin{tabularx}{\linewidth}{L{3cm} L{3cm} L{3cm} L{4cm}}
+        \toprule
+        \textbf{Miền} & \textbf{Điều kiện} & \textbf{Loại} & \textbf{Ví dụ} \\
+        \midrule
+        Valid   & [điều kiện] & Valid   & [ví dụ] \\
+        Invalid & [điều kiện] & Invalid & [ví dụ] \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\subsection{Bước 3: Chọn Điểm Kiểm Thử (Test Point Selection)}
+% TODO: Áp dụng chiến lược ON/OFF/IN points
+
+\subsection{Bước 4: Thiết Kế Test Cases — Domain Testing}
+\begin{longtable}{C{1cm} L{3cm} L{3.5cm} L{3cm} C{2cm} C{1.5cm}}
+    \caption{Test cases — Domain Testing, Feature A} \\
+    \toprule
+    \textbf{TC\#} & \textbf{Mô tả} & \textbf{Input} & \textbf{Expected Output} & \textbf{Kết quả} & \textbf{Trạng thái} \\
+    \midrule
+    \endfirsthead
+    \multicolumn{6}{c}{\small\itshape (tiếp theo)} \\
+    \toprule
+    \textbf{TC\#} & \textbf{Mô tả} & \textbf{Input} & \textbf{Expected Output} & \textbf{Kết quả} & \textbf{Trạng thái} \\
+    \midrule
+    \endhead
+    \midrule
+    \multicolumn{6}{r}{\small\itshape (còn tiếp)} \\
+    \endfoot
+    \bottomrule
+    \endlastfoot
+    % TODO: Điền các test case
+    TC-A-DT-01 & [Mô tả] & [Input] & [Expected] & [Actual] & \textcolor{green!60!black}{Pass} \\
+    TC-A-DT-02 & [Mô tả] & [Input] & [Expected] & [Actual] & \textcolor{red}{Fail} \\
+\end{longtable}
+
+\section{Boundary Value Analysis (BVA)}
+
+\subsection{Bước 1: Xác Định Ranh Giới (Boundaries)}
+% TODO: Với mỗi biến, xác định các giá trị biên
+\begin{table}[H]
+    \centering
+    \caption{Bảng giá trị biên — Feature A}
+    \begin{tabularx}{\linewidth}{L{2.5cm} C{2cm} C{2cm} C{2cm} C{2cm} L{3cm}}
+        \toprule
+        \textbf{Biến} & \textbf{Min} & \textbf{Min+1} & \textbf{Max-1} & \textbf{Max} & \textbf{Ghi chú} \\
+        \midrule
+        [Biến 1] & & & & & \\
+        [Biến 2] & & & & & \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\subsection{Bước 2: Thiết Kế Test Cases — BVA}
+\begin{longtable}{C{1cm} L{3cm} L{3.5cm} L{3cm} C{2cm} C{1.5cm}}
+    \caption{Test cases — BVA, Feature A} \\
+    \toprule
+    \textbf{TC\#} & \textbf{Mô tả} & \textbf{Input} & \textbf{Expected Output} & \textbf{Kết quả} & \textbf{Trạng thái} \\
+    \midrule
+    \endfirsthead
+    \toprule
+    \textbf{TC\#} & \textbf{Mô tả} & \textbf{Input} & \textbf{Expected Output} & \textbf{Kết quả} & \textbf{Trạng thái} \\
+    \midrule
+    \endhead
+    \bottomrule
+    \endlastfoot
+    TC-A-BV-01 & [Giá trị min] & [Input] & [Expected] & & \\
+    TC-A-BV-02 & [Giá trị min+1] & [Input] & [Expected] & & \\
+    TC-A-BV-03 & [Giá trị max-1] & [Input] & [Expected] & & \\
+    TC-A-BV-04 & [Giá trị max] & [Input] & [Expected] & & \\
+    TC-A-BV-05 & [Ngoài biên dưới] & [Input] & [Expected] & & \\
+    TC-A-BV-06 & [Ngoài biên trên] & [Input] & [Expected] & & \\
+\end{longtable}
+
+\section{AI Gap Analysis}
+% TODO: Mô tả những test case/bug mà AI bỏ sót và lý do tại sao
+\begin{itemize}
+    \item \textbf{Gap 1:} [Mô tả gap] — Lý do: [lý do AI bỏ sót]
+    \item \textbf{Gap 2:} [Mô tả gap] — Lý do: [lý do AI bỏ sót]
+\end{itemize}
+
+\section{Bug Reports — Feature A}
+% TODO: Mô tả từng bug tìm được
+
+\subsection{BUG-A-01: [Tên bug]}
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\linewidth}{L{3cm} X}
+        \toprule
+        \textbf{Trường} & \textbf{Nội dung} \\
+        \midrule
+        Bug ID       & BUG-A-01 \\
+        Tính năng    & [FR-xx] \\
+        Mức độ       & [Critical / Major / Minor / Trivial] \\
+        Mô tả        & [Mô tả ngắn gọn] \\
+        Tái hiện     & 1. [Bước 1] \newline 2. [Bước 2] \newline 3. [Bước 3] \\
+        Expected     & [Kết quả mong đợi] \\
+        Actual       & [Kết quả thực tế] \\
+        GitHub Issue & \url{https://github.com/[group]/eshop-sut/issues/[number]} \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+% TODO: Chèn screenshot bug
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=0.8\linewidth]{bug_a_01.png}
+%     \caption{Screenshot — BUG-A-01}
+% \end{figure}
+
+% ============================================================
+%  CHƯƠNG 3: FEATURE B — POOL B
+% ============================================================
+\chapter{Feature B — [Tên tính năng] (Pool B)}
+
+\section{Mô Tả Tính Năng}
+% TODO
+
+\section{Domain Testing}
+\subsection{Bước 1: Xác Định Các Biến Đầu Vào}
+\subsection{Bước 2: Phân Hoạch Miền}
+\subsection{Bước 3: Chọn Điểm Kiểm Thử}
+\subsection{Bước 4: Thiết Kế Test Cases — Domain Testing}
+% TODO: Copy bảng từ chương 2, đổi prefix TC-B-DT-
+
+\section{Boundary Value Analysis}
+\subsection{Bước 1: Xác Định Ranh Giới}
+\subsection{Bước 2: Thiết Kế Test Cases — BVA}
+% TODO: Copy bảng từ chương 2, đổi prefix TC-B-BV-
+
+\section{AI Gap Analysis}
+\section{Bug Reports — Feature B}
+
+% ============================================================
+%  CHƯƠNG 4: FEATURE C — POOL C
+% ============================================================
+\chapter{Feature C — [Tên tính năng] (Pool C)}
+
+\section{Mô Tả Tính Năng}
+\section{Domain Testing}
+\subsection{Bước 1: Xác Định Các Biến Đầu Vào}
+\subsection{Bước 2: Phân Hoạch Miền}
+\subsection{Bước 3: Chọn Điểm Kiểm Thử}
+\subsection{Bước 4: Thiết Kế Test Cases — Domain Testing}
+
+\section{Boundary Value Analysis}
+\subsection{Bước 1: Xác Định Ranh Giới}
+\subsection{Bước 2: Thiết Kế Test Cases — BVA}
+
+\section{AI Gap Analysis}
+\section{Bug Reports — Feature C}
+
+% ============================================================
+%  CHƯƠNG 5: FEATURE D — POOL D (MOBILE)
+% ============================================================
+\chapter{Feature D — [Tên tính năng] (Pool D — Mobile)}
+
+\section{Mô Tả Tính Năng}
+% TODO: Mô tả tính năng mobile
+
+\section{Domain Testing}
+\subsection{Bước 1: Xác Định Các Biến Đầu Vào}
+\subsection{Bước 2: Phân Hoạch Miền}
+\subsection{Bước 3: Chọn Điểm Kiểm Thử}
+\subsection{Bước 4: Thiết Kế Test Cases — Domain Testing}
+
+\section{Boundary Value Analysis}
+\subsection{Bước 1: Xác Định Ranh Giới}
+\subsection{Bước 2: Thiết Kế Test Cases — BVA}
+
+\section{AI Gap Analysis}
+\section{Bug Reports — Feature D}
+
+% ============================================================
+%  CHƯƠNG 6: AGENT SKILL
+% ============================================================
+\chapter{Agent Skill}
+
+\section{Mô Tả Skill}
+% TODO: Mô tả skill domain testing / BVA bạn đã xây dựng
+
+\section{Cách Sử Dụng}
+\begin{lstlisting}[language=Python, caption={Ví dụ sử dụng Agent Skill}]
+# TODO: Paste code hoặc prompt template của skill ở đây
+\end{lstlisting}
+
+\section{Video Demo}
+\begin{itemize}
+    \item \textbf{Video 1:} \url{https://youtube.com/...} — Demo trên Feature [X]
+\end{itemize}
+
+% ============================================================
+%  CHƯƠNG 7: TEST SUMMARY REPORT
+% ============================================================
+\chapter{Test Summary Report}
+
+\begin{table}[H]
+    \centering
+    \caption{Tổng kết kiểm thử}
+    \begin{tabularx}{\linewidth}{L{5cm} C{2.5cm} C{2.5cm} C{2.5cm} C{2cm}}
+        \toprule
+        \textbf{Tính năng} & \textbf{Thiết kế} & \textbf{Thực thi} & \textbf{Pass} & \textbf{Fail} \\
+        \midrule
+        Feature A (DT)  & & & & \\
+        Feature A (BVA) & & & & \\
+        Feature B (DT)  & & & & \\
+        Feature B (BVA) & & & & \\
+        Feature C (DT)  & & & & \\
+        Feature C (BVA) & & & & \\
+        Feature D (DT)  & & & & \\
+        Feature D (BVA) & & & & \\
+        \midrule
+        \textbf{Tổng} & \textbf{} & \textbf{} & \textbf{} & \textbf{} \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\begin{table}[H]
+    \centering
+    \caption{Tổng kết bug}
+    \begin{tabularx}{\linewidth}{L{4cm} C{2cm} C{2cm} C{2cm} C{2cm} C{2cm}}
+        \toprule
+        \textbf{Tính năng} & \textbf{Critical} & \textbf{Major} & \textbf{Minor} & \textbf{Trivial} & \textbf{Tổng} \\
+        \midrule
+        Feature A & & & & & \\
+        Feature B & & & & & \\
+        Feature C & & & & & \\
+        Feature D & & & & & \\
+        \midrule
+        \textbf{Tổng} & & & & & \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+% ============================================================
+%  PHỤ LỤC A: AI CRITIQUE
+% ============================================================
+\appendix
+\chapter{AI Critique}
+
+% TODO: Viết 200–300 từ theo hướng dẫn (Where did the AI get something
+% wrong / biased / incomplete? Why? What principle did you learn?)
+
+[Viết 200–300 từ ở đây]
+
+% ============================================================
+%  PHỤ LỤC B: AI AUDIT REPORT
+% ============================================================
+\chapter{AI Audit Report}
+
+\section*{Khai Báo Sử Dụng AI}
+% TODO: Điền vào theo quy định — xóa dòng không phù hợp
+
+\textit{``I use AI tools for the following tasks:''} [hoặc: \textit{``I do not use any AI help in this exercise.''}]
+
+\section*{Log Các Phiên Làm Việc Với AI}
+
+% ---- Interaction 1 ----
+\subsection*{Interaction 1}
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\linewidth}{L{3.5cm} X}
+        \toprule
+        \textbf{Trường} & \textbf{Nội dung} \\
+        \midrule
+        Công cụ AI    & [Claude / ChatGPT / Gemini / ...] \\
+        Ngày giờ      & [YYYY-MM-DD HH:MM] \\
+        Mục đích      & [Mục đích sử dụng AI] \\
+        \midrule
+        \textbf{Prompt} & \\
+        \multicolumn{2}{p{\linewidth}}{%
+            \texttt{[Paste prompt của bạn vào đây]}
+        } \\
+        \midrule
+        \textbf{AI Output} & \\
+        \multicolumn{2}{p{\linewidth}}{%
+            [Tóm tắt hoặc paste output của AI]
+        } \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+% Thêm các interaction tiếp theo theo cùng cấu trúc
+
+% ============================================================
+%  PHỤ LỤC C: GIT COMMIT LOG
+% ============================================================
+\chapter{Git Commit Log}
+
+\begin{lstlisting}[language=bash, caption={Git commit log}]
+# TODO: Paste output của lệnh:
+# git log --oneline --all
+# hoặc git log --pretty=format:"%h %ad %s" --date=short
+
+[hash] [date] feat(feature-a): domain testing - identify input variables
+[hash] [date] feat(feature-a): domain testing - partitioning
+[hash] [date] feat(feature-a): domain testing - test cases
+[hash] [date] feat(feature-a): bva - boundary identification
+[hash] [date] feat(feature-a): bva - test cases
+[hash] [date] bug(feature-a): report BUG-A-01
+...
+\end{lstlisting}
+
+% ============================================================
+%  TÀI LIỆU THAM KHẢO
+% ============================================================
+\chapter*{Tài Liệu Tham Khảo}
+\addcontentsline{toc}{chapter}{Tài Liệu Tham Khảo}
+
+\begin{enumerate}
+    \item ISTQB Foundation Level Syllabus (latest edition).
+    \item Hardman, P. (2025). \textit{A Post-AI Learning Taxonomy}.
+    \item Fuster Rabella, M. (2025). \textit{OECD Education Working Paper No.~338}.
+    \item Anthropic (2025). \textit{Building Reliable AI Test Agents} — engineering blog.
+    \item DeepEval \& Promptfoo documentation — LLM testing frameworks.
+\end{enumerate}
+
+\end{document}
