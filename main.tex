@@ -363,7 +363,29 @@ Mỗi biến được chia thành các lớp tương đương hợp lệ/không 
 \emph{chấp nhận} dù sai đặc tả. Hai lớp EC-P1 và EC-P2 chính là nơi lỗi biểu hiện rõ nhất.
 
 \subsection{Bước 3: Chọn Điểm Kiểm Thử (Test Point Selection)}
-% TODO: Áp dụng chiến lược ON/OFF/IN points
+Biến có thứ tự duy nhất là \texttt{password.length} với ranh giới $\ge 8$. Áp dụng chiến lược
+ON/OFF/IN, mọi giá trị dưới đây giữ nguyên các điều kiện lớp ký tự còn lại (1 chữ thường, 1
+chữ hoa, 1 chữ số, 1 khoảng trắng) để độ dài là biến duy nhất thay đổi.
+
+\begin{table}[H]
+    \centering
+    \caption{Điểm ON/OFF/IN/OUT — password.length ($\ge 8$)}
+    \begin{tabularx}{\linewidth}{L{2.4cm} L{3.2cm} C{2cm} X}
+        \toprule
+        \textbf{Loại điểm} & \textbf{Giá trị} & \textbf{Độ dài} & \textbf{Kỳ vọng} \\
+        \midrule
+        ON-point  & \texttt{Aa1 bcde}     & 8  & Chấp nhận (đúng biên) \\
+        OFF-point & \texttt{Aa1 bcd}      & 7  & Từ chối (dưới biên) \\
+        IN-point  & \texttt{Aa1 bcdefgh}  & 11 & Chấp nhận (trong miền) \\
+        OUT-point & \verb|""|             & 0  & Từ chối (ngoài miền) \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\noindent\textbf{Nhận xét quan trọng:} biên độ dài (\texttt{\{8,\}}) được cài đặt \emph{đúng}
+— không có off-by-one tại 8. Các khiếm khuyết nằm ở \emph{điều kiện lớp ký tự} (bắt buộc
+khoảng trắng, cấm ký tự đặc biệt), là các \emph{phân hoạch} (Bước~2) chứ không phải biên số
+học. Vì vậy Domain Testing phát hiện nhiều lỗi hơn BVA thuần túy ở tính năng này.
 
 \subsection{Bước 4: Thiết Kế Test Cases — Domain Testing}
 \begin{longtable}{C{1cm} L{3cm} L{3.5cm} L{3cm} C{2cm} C{1.5cm}}
