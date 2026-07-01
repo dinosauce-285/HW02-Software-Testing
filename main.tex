@@ -253,7 +253,10 @@ Mục này theo dõi phần \emph{đã làm} và phần \emph{chưa làm} của 
         \midrule
         \multicolumn{3}{l}{\textit{Feature C — FR-14 (Quản lý danh mục)}} \\
         \midrule
-        Toàn bộ chương            & \textcolor{red}{Chưa} & Chưa bắt đầu (Domain, BVA, gap, bug). \\
+        Domain + BVA (thiết kế)   & \textcolor{green!60!black}{Xong} & 14 ca DT + 7 ca BVA + gap analysis. \\
+        Thực thi + Kết quả thực   & \textcolor{red}{Chưa} & Cột Kết quả/Trạng thái đang là \emph{dự đoán từ nguồn}. \\
+        Screenshot bug (C-01..05) & \textcolor{red}{Chưa} & \texttt{bug\_c\_0X.png}. \\
+        GitHub Issues (C-01..05)  & \textcolor{red}{Chưa} & Tạo issue, điền URL. \\
         \midrule
         \multicolumn{3}{l}{\textit{Feature D — FR-07 (Giỏ hàng — Mobile)}} \\
         \midrule
@@ -264,7 +267,7 @@ Mục này theo dõi phần \emph{đã làm} và phần \emph{chưa làm} của 
         Chương 6 — Agent Skill    & \textcolor{orange}{Một phần} & Skill \texttt{domain-bva-test} đã có; cần viết mô tả + video demo (YouTube). \\
         Chương 7 — Test Summary   & \textcolor{red}{Chưa} & Điền số liệu sau khi thực thi (thiết kế/thực thi/pass/fail, bug theo mức độ). \\
         Phụ lục A — AI Critique   & \textcolor{red}{Chưa} & Viết 200--300 từ. \\
-        Phụ lục B — AI Audit      & \textcolor{green!60!black}{Xong} & Interaction 1 (FR-01) + Interaction 2 (FR-09). \\
+        Phụ lục B — AI Audit      & \textcolor{green!60!black}{Xong} & Interaction 1 (FR-01) + 2 (FR-09) + 3 (FR-14). \\
         Phụ lục C — Git Commit Log & \textcolor{red}{Chưa} & Dán output \texttt{git log} thực tế trước khi nộp. \\
         README + self-assessment  & \textcolor{red}{Chưa} & Bảng tự đánh giá + test summary (theo Mục 14 đề bài). \\
         \bottomrule
@@ -1498,6 +1501,36 @@ chụp màn hình và tạo GitHub Issue trước khi nộp.
         \textbf{AI Output} & \\
         \multicolumn{2}{p{\linewidth}}{%
             AI đọc \texttt{backend/server.js} (\texttt{/api/apply-coupon}) và \texttt{backend/database.js} (bảng \texttt{coupons}, seed SAVE10/BIGBUY/VIP100/EXPIRED); xác định 10 biến (kể cả biến đầu ra), phân hoạch miền cho code/total\_amount/user\_id/type/expiry, chọn điểm ON/OFF/IN cho biên \texttt{min\_order\_amount}, sinh 12 ca Domain (TC-B-DT) + 6 ca BVA (TC-B-BV), bảng gap analysis (6 mục), và 5 báo cáo lỗi ứng viên (BUG-B-01..05). Khiếm khuyết trọng tâm: công thức percent \texttt{1$-$discount\_value} làm giá tăng $\sim$10 lần; biên \texttt{min\_order\_amount} dùng \texttt{>} (off-by-one); bỏ qua giới hạn dùng khi vắng \texttt{user\_id}; endpoint không xác thực; không kẹp \texttt{final\_amount} $\ge 0$.
+        } \\
+        \midrule
+        \textbf{Human review} & \\
+        \multicolumn{2}{p{\linewidth}}{%
+            Sinh viên (Lý Quốc Thạnh) chịu trách nhiệm: cần \emph{thực thi} các ca trên EShop để điền cột Kết quả/Trạng thái thực tế, chụp màn hình và tạo GitHub Issue cho từng bug đã xác nhận. Các giá trị ``dự đoán từ nguồn'' phải được kiểm chứng trước khi nộp.
+        } \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+% ---- Interaction 3 ----
+\subsection*{Interaction 3 — Domain Testing \& BVA cho FR-14 (Quản lý danh mục)}
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\linewidth}{L{3.5cm} X}
+        \toprule
+        \textbf{Trường} & \textbf{Nội dung} \\
+        \midrule
+        Công cụ AI    & Claude Code (Opus 4.8) \\
+        Ngày giờ      & 2026-07-01 22:20 \\
+        Mục đích      & Áp dụng Domain Testing + BVA cho FR-14 (CRUD danh mục, trang admin); phân tích 4 endpoint category + middleware xác thực. \\
+        \midrule
+        \textbf{Prompt} & \\
+        \multicolumn{2}{p{\linewidth}}{%
+            \texttt{tiếp tục testing, phần feature B có dùng /domain-bva-test không, nếu không thì dùng rồi kiểm tra lại, làm phần c} — dùng skill \texttt{domain-bva-test}, điền trực tiếp Chương Feature C của \texttt{main.tex} bằng tiếng Việt, cùng style Feature A/B, chế độ ``sinh viên tự chạy, AI dự đoán''.
+        } \\
+        \midrule
+        \textbf{AI Output} & \\
+        \multicolumn{2}{p{\linewidth}}{%
+            AI đọc \texttt{backend/server.js} (4 endpoint \texttt{/api/categories} + middleware \texttt{authenticateToken}) và \texttt{backend/database.js} (bảng \texttt{categories}, seed 3 danh mục + sản phẩm); xác định 7 biến, phân hoạch miền cho name/id/quyền, chọn điểm ON/OFF/IN cho ranh giới \emph{tồn tại} của \texttt{id}, sinh 14 ca Domain (TC-C-DT) + 7 ca BVA (TC-C-BV), bảng gap analysis (6 mục), và 5 báo cáo lỗi ứng viên (BUG-C-01..05). Khiếm khuyết trọng tâm: thiếu kiểm soát quyền admin (mọi user CRUD được danh mục); không kiểm \texttt{name} (rỗng/trùng/dài); PUT/DELETE id không tồn tại vẫn trả 200; xóa danh mục làm mồ côi sản phẩm (thiếu khóa ngoại).
         } \\
         \midrule
         \textbf{Human review} & \\
