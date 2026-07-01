@@ -1574,7 +1574,85 @@ làm lộ lỗi bỏ món cuối (BUG-D-02).
 \section{Bug Reports — Feature D}
 Bốn lỗi ứng viên dưới đây suy ra từ phân tích mã nguồn mobile; cần \textbf{xác nhận bằng thực
 thi trên app}, chụp màn hình và tạo GitHub Issue trước khi nộp.
-% BUGS-D-HERE
+\subsection{BUG-D-01: Sửa số lượng trong giỏ bị cộng thêm 1 (off-by-one)}
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\linewidth}{L{3cm} X}
+        \toprule
+        \textbf{Trường} & \textbf{Nội dung} \\
+        \midrule
+        Bug ID       & BUG-D-01 \\
+        Tính năng    & FR-07 (Mobile) \quad\textbf{Kỹ thuật:} Domain + BVA \\
+        Mức độ       & Major \\
+        Mô tả        & Handler \texttt{onChangeText} của ô số lượng trong giỏ đặt \texttt{quantity = parsed + 1}; nhập $N$ thì lưu $N+1$, làm sai số lượng và tổng tiền mỗi lần sửa. \\
+        Tái hiện     & 1. Thêm 1 sản phẩm vào giỏ. \newline 2. Mở giỏ, sửa ô số lượng thành \texttt{2}. \newline 3. Quan sát số lượng/thành tiền. \\
+        Expected     & Số lượng = 2. \\
+        Actual       & Số lượng = 3 (dự đoán từ nguồn). \\
+        GitHub Issue & \url{https://github.com/[group]/eshop-sut/issues/[number]} \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+% \begin{figure}[H]\centering\includegraphics[width=0.8\linewidth]{bug_d_01.png}\caption{Screenshot — BUG-D-01}\end{figure}
+
+\subsection{BUG-D-02: Checkout bỏ mất món cuối nhưng vẫn tính đủ tiền}
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\linewidth}{L{3cm} X}
+        \toprule
+        \textbf{Trường} & \textbf{Nội dung} \\
+        \midrule
+        Bug ID       & BUG-D-02 \\
+        Tính năng    & FR-07 (Mobile) \quad\textbf{Kỹ thuật:} Domain + BVA \\
+        Mức độ       & Major \\
+        Mô tả        & \texttt{handleConfirmCheckout} gửi \verb|items = cart.length > 1 ? cart.slice(0,-1) : cart| — bỏ món cuối khi giỏ có $>1$ món, trong khi \texttt{total\_amount} vẫn bằng \texttt{cartTotal} (tính đủ mọi món). Đơn ghi thiếu món nhưng khách trả đủ tiền. \\
+        Tái hiện     & 1. Thêm 3 sản phẩm khác nhau vào giỏ. \newline 2. Thanh toán. \newline 3. Xem đơn ở lịch sử: chỉ 2 món, tổng tính cho 3. \\
+        Expected     & Đơn gồm đủ 3 món, tổng tiền khớp danh sách món. \\
+        Actual       & Đơn chỉ 2 món, tổng tính đủ 3 (dự đoán từ nguồn). \\
+        GitHub Issue & \url{https://github.com/[group]/eshop-sut/issues/[number]} \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+% \begin{figure}[H]\centering\includegraphics[width=0.8\linewidth]{bug_d_02.png}\caption{Screenshot — BUG-D-02}\end{figure}
+
+\subsection{BUG-D-03: Số lượng không hợp lệ bị âm thầm ép về 1}
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\linewidth}{L{3cm} X}
+        \toprule
+        \textbf{Trường} & \textbf{Nội dung} \\
+        \midrule
+        Bug ID       & BUG-D-03 \\
+        Tính năng    & FR-07 (Mobile) \quad\textbf{Kỹ thuật:} Domain \\
+        Mức độ       & Minor \\
+        Mô tả        & \texttt{normalizeQuantity} dùng \texttt{parseInt} và ép mọi giá trị không hợp lệ (0, âm, chữ) về \texttt{1}; số thập phân bị cắt (\texttt{"2.9"}$\to$2) — không báo cho người dùng biết đầu vào đã bị thay đổi. \\
+        Tái hiện     & 1. Trang chi tiết, nhập số lượng \texttt{0} (hoặc \texttt{-2}, \texttt{abc}, \texttt{2.9}). \newline 2. Thêm vào giỏ. \\
+        Expected     & Báo lỗi/không cho thêm với số lượng không hợp lệ. \\
+        Actual       & Âm thầm thêm với số lượng 1 (hoặc phần nguyên) (dự đoán từ nguồn). \\
+        GitHub Issue & \url{https://github.com/[group]/eshop-sut/issues/[number]} \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+% \begin{figure}[H]\centering\includegraphics[width=0.8\linewidth]{bug_d_03.png}\caption{Screenshot — BUG-D-03}\end{figure}
+
+\subsection{BUG-D-04: Không giới hạn số lượng / không kiểm tồn kho}
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\linewidth}{L{3cm} X}
+        \toprule
+        \textbf{Trường} & \textbf{Nội dung} \\
+        \midrule
+        Bug ID       & BUG-D-04 \\
+        Tính năng    & FR-07 (Mobile) \quad\textbf{Kỹ thuật:} BVA \\
+        Mức độ       & Minor \\
+        Mô tả        & Không có biên trên cho số lượng và không có mô hình tồn kho; có thể thêm số lượng cực lớn (vd \texttt{999999}) vào giỏ, tạo tổng tiền phi lý. \\
+        Tái hiện     & 1. Trang chi tiết, nhập số lượng \texttt{999999}. \newline 2. Thêm vào giỏ, xem tổng. \\
+        Expected     & Giới hạn theo tồn kho / mức tối đa hợp lý. \\
+        Actual       & Chấp nhận toàn bộ, tổng tiền cực lớn (dự đoán từ nguồn). \\
+        GitHub Issue & \url{https://github.com/[group]/eshop-sut/issues/[number]} \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+% \begin{figure}[H]\centering\includegraphics[width=0.8\linewidth]{bug_d_04.png}\caption{Screenshot — BUG-D-04}\end{figure}
 
 % ============================================================
 %  CHƯƠNG 6: AGENT SKILL
