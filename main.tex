@@ -1351,23 +1351,230 @@ chụp màn hình và tạo GitHub Issue trước khi nộp.
 % ============================================================
 %  CHƯƠNG 5: FEATURE D — POOL D (MOBILE)
 % ============================================================
-\chapter{Feature D — [Tên tính năng] (Pool D — Mobile)}
+\chapter{Feature D — Giỏ hàng (Pool D — Mobile)}
 
 \section{Mô Tả Tính Năng}
-% TODO: Mô tả tính năng mobile
+Tính năng \textbf{FR-07 — Giỏ hàng} trên app \emph{mobile} (React Native/Expo) cho phép thêm
+sản phẩm vào giỏ, chỉnh số lượng, xóa, rồi thanh toán. Toàn bộ logic nằm trong
+\texttt{frontend-mobile/App.js} (giỏ hàng là \emph{trạng thái phía client}, chưa gọi API cho
+tới khi checkout).
+
+\begin{itemize}
+    \item \texttt{normalizeQuantity(v)} — \texttt{parseInt}; trả về giá trị nếu hữu hạn và
+    $>0$, ngược lại trả \texttt{1}.
+    \item \texttt{addToCart(product, qty)} — nếu sản phẩm đã có trong giỏ thì cộng dồn số
+    lượng; ngược lại thêm mục mới; luôn hiện \texttt{Alert} ``Đã thêm''.
+    \item \textbf{Ô sửa số lượng trong giỏ} — \texttt{onChangeText} đặt
+    \texttt{quantity = (parsed>0) ? parsed + 1 : 1}.
+    \item \texttt{cartTotal} $= \sum(\texttt{price}\times\texttt{quantity})$.
+    \item \texttt{handleConfirmCheckout} — gửi \verb|items = cart.length > 1 ? cart.slice(0,-1) : cart|
+    và \texttt{total\_amount = final\_amount ?? cartTotal}.
+\end{itemize}
+
+\vspace{4pt}
+\noindent\textbf{Trích mã (rút gọn):}
+\begin{lstlisting}[caption={Giỏ hàng — App.js (rút gọn)},numbers=none]
+// (A) ep so luong hop le
+const normalizeQuantity = (value) => {
+  const parsed = parseInt(value, 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
+};
+// (B) o sua so luong trong gio -> luu parsed + 1
+newCart[index].quantity = (Number.isFinite(parsed) && parsed > 0) ? parsed + 1 : 1;
+// (C) checkout bo mat mon cuoi khi gio > 1 mon
+items: cart.length > 1 ? cart.slice(0, -1) : cart,
+total_amount: finalAmount,   // = cartTotal (tinh du moi mon)
+\end{lstlisting}
+
+\begin{notebox}
+Khiếm khuyết trọng tâm: \textbf{(B)} sửa số lượng thành $N$ thì giỏ lưu $N+1$ (off-by-one, thổi
+phồng số lượng mỗi lần sửa); \textbf{(C)} khi giỏ có $>1$ món, \texttt{slice(0,-1)} \emph{bỏ mất
+món cuối} khỏi đơn nhưng \texttt{total\_amount} vẫn tính đủ mọi món $\Rightarrow$ khách bị tính
+tiền món không được ghi nhận. Ngoài ra \textbf{(A)} âm thầm ép mọi số lượng không hợp lệ
+(0/âm/chữ/thập phân) về 1.
+\end{notebox}
+
+\begin{notebox}
+\textbf{Quy ước cột kết quả} (như Feature A/B/C): cột \emph{Kết quả}/\emph{Trạng thái} là giá
+trị \textbf{dự đoán từ phân tích mã nguồn}, cần xác nhận khi chạy app + chụp màn hình.
+\end{notebox}
 
 \section{Domain Testing}
-\subsection{Bước 1: Xác Định Các Biến Đầu Vào}
-\subsection{Bước 2: Phân Hoạch Miền}
-\subsection{Bước 3: Chọn Điểm Kiểm Thử}
-\subsection{Bước 4: Thiết Kế Test Cases — Domain Testing}
 
-\section{Boundary Value Analysis}
+\subsection{Bước 1: Xác Định Các Biến Đầu Vào}
+\begin{table}[H]
+    \centering
+    \caption{Danh sách biến — Feature D (FR-07 Mobile)}
+    \begin{tabularx}{\linewidth}{C{0.5cm} L{3.2cm} L{2.6cm} C{1.8cm} X}
+        \toprule
+        \textbf{\#} & \textbf{Biến} & \textbf{Kiểu} & \textbf{Vào/Ra} & \textbf{Ghi chú} \\
+        \midrule
+        1 & quantity (trang chi tiết) & string$\to$int & Input & Biên $>0$; \texttt{parseInt} + ép về 1. \\
+        2 & quantity (ô sửa trong giỏ) & string$\to$int & Input & Handler lưu \texttt{parsed+1} (lỗi). \\
+        3 & cart.length & integer & Trạng thái & Biên tại 1: $>1$ kích hoạt \texttt{slice(0,-1)}. \\
+        4 & product.id & integer & Input & Trùng id $\Rightarrow$ cộng dồn số lượng. \\
+        5 & cartTotal / total\_amount & integer & \textbf{Output} & Tính đủ mọi món dù đơn thiếu món. \\
+        6 & stock / max qty & --- & (thiếu) & Không có mô hình tồn kho/giới hạn. \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\subsection{Bước 2: Phân Hoạch Miền}
+Dấu \emph{*} = lớp mà hệ thống \emph{đúng} phải xử lý nhưng mã hiện tại làm sai.
+
+\subsubsection{Biến quantity (thêm vào giỏ)}
+\begin{table}[H]
+    \centering
+    \caption{Phân hoạch miền — quantity (addToCart)}
+    \begin{tabularx}{\linewidth}{C{1.4cm} L{6cm} C{1.6cm} X}
+        \toprule
+        \textbf{EC} & \textbf{Điều kiện} & \textbf{Loại} & \textbf{Ví dụ} \\
+        \midrule
+        EC-Q1 & Số nguyên dương & Valid & \texttt{3} \\
+        EC-Q2 & Mặc định 1 & Valid & \texttt{1} \\
+        EC-Q3 & Bằng 0 & Invalid* & \texttt{0} $\to$ ép 1 \\
+        EC-Q4 & Âm & Invalid* & \texttt{-2} $\to$ ép 1 \\
+        EC-Q5 & Không phải số & Invalid* & \texttt{abc} $\to$ ép 1 \\
+        EC-Q6 & Thập phân & Invalid* & \texttt{2.9} $\to$ 2 (cắt) \\
+        EC-Q7 & Rất lớn (không có tồn kho/max) & Valid* & \texttt{999999} \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\subsubsection{Biến quantity (ô sửa trong giỏ) \& cart.length}
+\begin{table}[H]
+    \centering
+    \caption{Phân hoạch miền — sửa số lượng \& số món trong giỏ}
+    \begin{tabularx}{\linewidth}{C{1.4cm} L{6.5cm} C{1.6cm} X}
+        \toprule
+        \textbf{EC} & \textbf{Điều kiện} & \textbf{Loại} & \textbf{Kỳ vọng} \\
+        \midrule
+        EC-ED1 & Sửa thành $N>0$ & Invalid* & \emph{Nên} lưu $N$; code lưu $N+1$ \\
+        EC-ED2 & Sửa thành 0/không hợp lệ & Invalid* & Reset về 1 (âm thầm) \\
+        EC-L1 & Giỏ có 0 món & Boundary & Không cho checkout \\
+        EC-L2 & Giỏ có 1 món & Valid & Gửi đủ 1 món \\
+        EC-L3 & Giỏ có $>1$ món & Invalid* & \emph{Bỏ mất} món cuối (slice) \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\subsection{Bước 3: Chọn Điểm Kiểm Thử (ON/OFF/IN/OUT)}
+Hai biên đáng chú ý: \texttt{quantity} tại ranh giới $>0$ và \texttt{cart.length} tại ranh giới
+$1$ (nơi \texttt{slice(0,-1)} bắt đầu bỏ món).
+
+\begin{table}[H]
+    \centering
+    \caption{Điểm ON/OFF/IN — quantity ($>0$) và cart.length}
+    \begin{tabularx}{\linewidth}{L{3.4cm} C{2cm} X}
+        \toprule
+        \textbf{Biên} & \textbf{Giá trị} & \textbf{Kỳ vọng (đặc tả)} \\
+        \midrule
+        quantity OFF   & 0 & Từ chối/giữ nguyên (code ép 1) \\
+        quantity ON    & 1 & Chấp nhận, số lượng = 1 \\
+        quantity IN    & 2 & Chấp nhận, số lượng = 2 \\
+        cart.length ON & 1 & Gửi đủ 1 món \\
+        cart.length +1 & 2 & Gửi đủ 2 món (code bỏ 1) \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\noindent\textbf{Nhận xét:} biên \texttt{addToCart} xử lý số lượng \emph{tương đối} ổn (ép về 1),
+nhưng ô \emph{sửa} trong giỏ lại cộng thêm 1 (BUG-D-01); và biên \texttt{cart.length=1$\to$2}
+làm lộ lỗi bỏ món cuối (BUG-D-02).
+
+\subsection{Bước 4: Thiết Kế Test Cases — Domain Testing}
+\begin{longtable}{C{1.2cm} L{3.2cm} L{3.1cm} L{3cm} C{1.9cm} C{1.4cm}}
+    \caption{Test cases — Domain Testing, Feature D} \\
+    \toprule
+    \textbf{TC\#} & \textbf{Mô tả} & \textbf{Input} & \textbf{Expected Output} & \textbf{Kết quả} & \textbf{Trạng thái} \\
+    \midrule
+    \endfirsthead
+    \multicolumn{6}{c}{\small\itshape (tiếp theo)} \\
+    \toprule
+    \textbf{TC\#} & \textbf{Mô tả} & \textbf{Input} & \textbf{Expected Output} & \textbf{Kết quả} & \textbf{Trạng thái} \\
+    \midrule
+    \endhead
+    \midrule
+    \multicolumn{6}{r}{\small\itshape (còn tiếp)} \\
+    \endfoot
+    \bottomrule
+    \endlastfoot
+    TC-D-DT-01 & Thêm với số lượng 3 & qty=\texttt{"3"} & Giỏ có món, qty=3 & qty=3 & \textcolor{green!60!black}{Pass} \\
+    TC-D-DT-02 & Thêm số lượng 0 \newline (BUG-D-03) & qty=\texttt{"0"} & Từ chối/giữ 0 & Âm thầm ép qty=1 & \textcolor{orange}{Note} \\
+    TC-D-DT-03 & Thêm số lượng âm \newline (BUG-D-03) & qty=\texttt{"-2"} & Từ chối & Ép qty=1 & \textcolor{orange}{Note} \\
+    TC-D-DT-04 & Thêm số lượng chữ \newline (BUG-D-03) & qty=\texttt{"abc"} & Từ chối & Ép qty=1 & \textcolor{orange}{Note} \\
+    TC-D-DT-05 & Thêm số lượng thập phân \newline (BUG-D-03) & qty=\texttt{"2.9"} & Từ chối/làm tròn rõ ràng & \texttt{parseInt}$\to$2 (cắt) & \textcolor{orange}{Note} \\
+    TC-D-DT-06 & Thêm trùng sản phẩm (2 rồi 3) & cùng id & Cộng dồn = 5 & 5 & \textcolor{green!60!black}{Pass} \\
+    TC-D-DT-07 & Sửa số lượng trong giỏ thành 2 \newline (BUG-D-01) & ô sửa = \texttt{2} & qty=2 & qty=3 (parsed+1) & \textcolor{red}{Fail} \\
+    TC-D-DT-08 & Sửa số lượng trong giỏ thành 5 \newline (BUG-D-01) & ô sửa = \texttt{5} & qty=5 & qty=6 & \textcolor{red}{Fail} \\
+    TC-D-DT-09 & Sửa thành giá trị không hợp lệ & ô sửa = \texttt{"x"} & Giữ nguyên/báo lỗi & Reset về 1 & \textcolor{orange}{Note} \\
+    TC-D-DT-10 & Xóa một món khỏi giỏ & bấm ``Xóa'' & Món bị xóa & Bị xóa & \textcolor{green!60!black}{Pass} \\
+    TC-D-DT-11 & Checkout giỏ 1 món & 1 món & Đơn gồm đúng 1 món & Đúng & \textcolor{green!60!black}{Pass} \\
+    TC-D-DT-12 & Checkout giỏ 3 món \newline (BUG-D-02) & 3 món & Đơn gồm 3 món, tổng khớp & Đơn chỉ 2 món, tính đủ 3 & \textcolor{red}{Fail} \\
+    TC-D-DT-13 & Thêm số lượng cực lớn \newline (BUG-D-04) & qty=\texttt{"999999"} & Chặn theo tồn kho/max & Chấp nhận & \textcolor{red}{Fail} \\
+    TC-D-DT-14 & Checkout giỏ rỗng & 0 món & Chặn (không cho checkout) & Vào màn checkout & \textcolor{orange}{Note} \\
+\end{longtable}
+
+\section{Boundary Value Analysis (BVA)}
+
 \subsection{Bước 1: Xác Định Ranh Giới}
+\begin{table}[H]
+    \centering
+    \caption{Bảng giá trị biên — Feature D (FR-07 Mobile)}
+    \begin{tabularx}{\linewidth}{L{3.4cm} C{1.8cm} C{1.8cm} C{1.8cm} X}
+        \toprule
+        \textbf{Biên} & \textbf{Off/dưới} & \textbf{On} & \textbf{On+1} & \textbf{Ghi chú} \\
+        \midrule
+        quantity $>0$ (thêm) & 0 & 1 & 2 & 0 bị ép về 1; không có biên trên (thiếu tồn kho). \\
+        quantity (ô sửa giỏ) & 0/invalid & 1 & 2 & Lưu $N+1$: nhập 1$\to$2, 2$\to$3 (BUG-D-01). \\
+        cart.length & 0 & 1 & 2 & $\ge 2$ bỏ mất món cuối (BUG-D-02). \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
 \subsection{Bước 2: Thiết Kế Test Cases — BVA}
+\begin{longtable}{C{1.2cm} L{3.2cm} L{3.1cm} L{3cm} C{1.9cm} C{1.4cm}}
+    \caption{Test cases — BVA, Feature D} \\
+    \toprule
+    \textbf{TC\#} & \textbf{Mô tả} & \textbf{Input} & \textbf{Expected Output} & \textbf{Kết quả} & \textbf{Trạng thái} \\
+    \midrule
+    \endfirsthead
+    \toprule
+    \textbf{TC\#} & \textbf{Mô tả} & \textbf{Input} & \textbf{Expected Output} & \textbf{Kết quả} & \textbf{Trạng thái} \\
+    \midrule
+    \endhead
+    \bottomrule
+    \endlastfoot
+    TC-D-BV-01 & qty dưới biên (0) \newline (BUG-D-03) & thêm qty=\texttt{"0"} & Từ chối & Ép về 1 & \textcolor{orange}{Note} \\
+    TC-D-BV-02 & qty đúng biên (1) & thêm qty=\texttt{"1"} & qty=1 & qty=1 & \textcolor{green!60!black}{Pass} \\
+    TC-D-BV-03 & qty trên biên (2) & thêm qty=\texttt{"2"} & qty=2 & qty=2 & \textcolor{green!60!black}{Pass} \\
+    TC-D-BV-04 & Ô sửa giỏ nhập 1 \newline (BUG-D-01) & ô sửa=\texttt{1} & qty=1 & qty=2 (parsed+1) & \textcolor{red}{Fail} \\
+    TC-D-BV-05 & cart.length=1 & 1 món checkout & Đơn đủ 1 món & Đúng & \textcolor{green!60!black}{Pass} \\
+    TC-D-BV-06 & cart.length=2 \newline (BUG-D-02) & 2 món checkout & Đơn đủ 2 món & Đơn chỉ 1 món & \textcolor{red}{Fail} \\
+    TC-D-BV-07 & qty biên trên (không max) \newline (BUG-D-04) & qty=\texttt{"999999"} & Chặn/giới hạn & Chấp nhận & \textcolor{red}{Fail} \\
+\end{longtable}
 
 \section{AI Gap Analysis}
+\begin{table}[H]
+    \centering
+    \caption{AI Gap Analysis — Feature D (FR-07 Mobile)}
+    \begin{tabularx}{\linewidth}{C{0.5cm} X L{4cm} C{1.8cm}}
+        \toprule
+        \textbf{\#} & \textbf{Ca/bug bị bỏ sót} & \textbf{Lý do bỏ sót} & \textbf{Bổ sung ở TC} \\
+        \midrule
+        1 & Ô sửa số lượng lưu \texttt{parsed+1} — cần đọc \emph{đúng phép tính} trong handler, không chỉ ``cập nhật số lượng''. & Giới hạn công cụ + độ phức tạp (logic UI mobile). & TC-D-DT-07/08, BV-04 \\
+        2 & Checkout bỏ mất món cuối (\texttt{slice(0,-1)}) trong khi tổng tiền tính đủ. & Độ phức tạp (biến \emph{đầu ra}, chỉ lộ khi giỏ $>1$ món — trạng thái). & TC-D-DT-12, BV-06 \\
+        3 & Ép âm thầm số lượng 0/âm/chữ/thập phân về 1. & Chất lượng prompt (dễ coi là ``đã xử lý'' thay vì lỗi UX). & TC-D-DT-02..05 \\
+        4 & Không có giới hạn số lượng/tồn kho (biên trên). & Độ phức tạp/robustness; BVA thường chỉ nhìn biên đã đặc tả. & TC-D-DT-13, BV-07 \\
+        5 & Lỗi phụ thuộc \emph{trạng thái nhiều món} (cart.length$>1$) — khó phát hiện nếu chỉ thử 1 món. & Độ phức tạp nội tại (tương tác trạng thái). & TC-D-DT-12 \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
 \section{Bug Reports — Feature D}
+Bốn lỗi ứng viên dưới đây suy ra từ phân tích mã nguồn mobile; cần \textbf{xác nhận bằng thực
+thi trên app}, chụp màn hình và tạo GitHub Issue trước khi nộp.
+% BUGS-D-HERE
 
 % ============================================================
 %  CHƯƠNG 6: AGENT SKILL
