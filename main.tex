@@ -453,12 +453,12 @@ là một phát hiện (xem Gap Analysis).
     \endhead
     \bottomrule
     \endlastfoot
-    TC-A-BV-01 & [Giá trị min] & [Input] & [Expected] & & \\
-    TC-A-BV-02 & [Giá trị min+1] & [Input] & [Expected] & & \\
-    TC-A-BV-03 & [Giá trị max-1] & [Input] & [Expected] & & \\
-    TC-A-BV-04 & [Giá trị max] & [Input] & [Expected] & & \\
-    TC-A-BV-05 & [Ngoài biên dưới] & [Input] & [Expected] & & \\
-    TC-A-BV-06 & [Ngoài biên trên] & [Input] & [Expected] & & \\
+    TC-A-BV-01 & Min$-1$: độ dài 7 & pw=\texttt{Aa1 bcd} (7) & Từ chối (dưới biên) & Từ chối & \textcolor{green!60!black}{Pass} \\
+    TC-A-BV-02 & Min: độ dài 8 & pw=\texttt{Aa1 bcde} (8) & Chấp nhận (qua regex) & Chấp nhận & \textcolor{green!60!black}{Pass} \\
+    TC-A-BV-03 & Min$+1$: độ dài 9 & pw=\texttt{Aa1 bcdef} (9) & Chấp nhận & Chấp nhận & \textcolor{green!60!black}{Pass} \\
+    TC-A-BV-04 & Ngoài biên dưới: rỗng & pw=\verb|""| (0) & Từ chối & Từ chối (\texttt{required}+regex) & \textcolor{green!60!black}{Pass} \\
+    TC-A-BV-05 & Biên trên không xác định (API) \newline (BUG-A-05) & pw dài 100.000 ký tự & Nên giới hạn/từ chối & Chấp nhận, lưu toàn bộ & \textcolor{red}{Fail} \\
+    TC-A-BV-06 & (API) name/email cực dài & name dài 100.000 ký tự & Nên giới hạn/từ chối & Chấp nhận & \textcolor{red}{Fail} \\
 \end{longtable}
 
 \section{AI Gap Analysis}
