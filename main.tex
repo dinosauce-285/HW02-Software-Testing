@@ -209,7 +209,6 @@
 \end{itemize}
 
 \section{Các Tính Năng Được Chọn}
-% TODO: Điền 4 tính năng bạn đã chọn (mỗi Pool 1 tính năng)
 \begin{table}[H]
     \centering
     \caption{Tính năng được chọn}
@@ -221,6 +220,53 @@
         B & FR-09 & Mã giảm giá & Áp dụng mã giảm giá (percent/fixed) cho đơn hàng. \\
         C & FR-14 & Quản lý danh mục (CRUD) & Thêm/sửa/xóa danh mục sản phẩm (trang admin). \\
         D & FR-07 & Giỏ hàng (Mobile) & Thêm/sửa số lượng/xóa sản phẩm trong giỏ trên app mobile. \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\section{Trạng Thái Hoàn Thành}
+\begin{notebox}
+Mục này theo dõi phần \emph{đã làm} và phần \emph{chưa làm} của báo cáo (cập nhật
+2026-07-01). Các ô ``dự đoán từ nguồn'' cần được thực thi + xác nhận trước khi nộp.
+\end{notebox}
+
+\begin{table}[H]
+    \centering
+    \caption{Checklist tiến độ theo tính năng và hạng mục}
+    \begin{tabularx}{\linewidth}{L{4.2cm} C{2.2cm} X}
+        \toprule
+        \textbf{Hạng mục} & \textbf{Trạng thái} & \textbf{Ghi chú / phần còn thiếu} \\
+        \midrule
+        \multicolumn{3}{l}{\textit{Feature A — FR-01 (Đăng ký)}} \\
+        \midrule
+        Domain + BVA (thiết kế)   & \textcolor{green!60!black}{Xong} & 12 ca DT + 6 ca BVA + gap analysis. \\
+        Thực thi + Kết quả thực   & \textcolor{red}{Chưa} & Cột Kết quả/Trạng thái đang là \emph{dự đoán từ nguồn}; cần chạy EShop. \\
+        Screenshot bug (A-01..06) & \textcolor{red}{Chưa} & Đặt tại \texttt{figures/}, đặt tên \texttt{bug\_a\_0X.png}. \\
+        GitHub Issues (A-01..06)  & \textcolor{red}{Chưa} & Tạo issue, điền URL vào ô \emph{GitHub Issue}. \\
+        \midrule
+        \multicolumn{3}{l}{\textit{Feature B — FR-09 (Mã giảm giá)}} \\
+        \midrule
+        Domain + BVA (thiết kế)   & \textcolor{green!60!black}{Xong} & 12 ca DT + 6 ca BVA + gap analysis. \\
+        Thực thi + Kết quả thực   & \textcolor{red}{Chưa} & Cột Kết quả/Trạng thái đang là \emph{dự đoán từ nguồn}. \\
+        Screenshot bug (B-01..05) & \textcolor{red}{Chưa} & \texttt{bug\_b\_0X.png}. \\
+        GitHub Issues (B-01..05)  & \textcolor{red}{Chưa} & Tạo issue, điền URL. \\
+        \midrule
+        \multicolumn{3}{l}{\textit{Feature C — FR-14 (Quản lý danh mục)}} \\
+        \midrule
+        Toàn bộ chương            & \textcolor{red}{Chưa} & Chưa bắt đầu (Domain, BVA, gap, bug). \\
+        \midrule
+        \multicolumn{3}{l}{\textit{Feature D — FR-07 (Giỏ hàng — Mobile)}} \\
+        \midrule
+        Toàn bộ chương            & \textcolor{red}{Chưa} & Chưa bắt đầu (Domain, BVA, gap, bug). \\
+        \midrule
+        \multicolumn{3}{l}{\textit{Hạng mục chung}} \\
+        \midrule
+        Chương 6 — Agent Skill    & \textcolor{orange}{Một phần} & Skill \texttt{domain-bva-test} đã có; cần viết mô tả + video demo (YouTube). \\
+        Chương 7 — Test Summary   & \textcolor{red}{Chưa} & Điền số liệu sau khi thực thi (thiết kế/thực thi/pass/fail, bug theo mức độ). \\
+        Phụ lục A — AI Critique   & \textcolor{red}{Chưa} & Viết 200--300 từ. \\
+        Phụ lục B — AI Audit      & \textcolor{green!60!black}{Xong} & Interaction 1 (FR-01) + Interaction 2 (FR-09). \\
+        Phụ lục C — Git Commit Log & \textcolor{red}{Chưa} & Dán output \texttt{git log} thực tế trước khi nộp. \\
+        README + self-assessment  & \textcolor{red}{Chưa} & Bảng tự đánh giá + test summary (theo Mục 14 đề bài). \\
         \bottomrule
     \end{tabularx}
 \end{table}
