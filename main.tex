@@ -1114,6 +1114,36 @@ chụp màn hình và tạo GitHub Issue trước khi nộp.
     \end{tabularx}
 \end{table}
 
+% ---- Interaction 2 ----
+\subsection*{Interaction 2 — Domain Testing \& BVA cho FR-09 (Mã giảm giá)}
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\linewidth}{L{3.5cm} X}
+        \toprule
+        \textbf{Trường} & \textbf{Nội dung} \\
+        \midrule
+        Công cụ AI    & Claude Code (Opus 4.8) \\
+        Ngày giờ      & 2026-07-01 22:12 \\
+        Mục đích      & Áp dụng Domain Testing + BVA cho FR-09, phân tích logic \texttt{apply-coupon} và thiết kế ca kiểm thử, gap analysis, báo cáo lỗi. \\
+        \midrule
+        \textbf{Prompt} & \\
+        \multicolumn{2}{p{\linewidth}}{%
+            \texttt{đọc đề và làm tiếp tục HW02-Domain-Testing.md} — kèm hướng dẫn từng bước trong skill \texttt{domain-bva-test}, điền trực tiếp Chương 4 (Feature B) của \texttt{main.tex} bằng tiếng Việt, cùng style với Feature A, chế độ ``sinh viên tự chạy, AI dự đoán''.
+        } \\
+        \midrule
+        \textbf{AI Output} & \\
+        \multicolumn{2}{p{\linewidth}}{%
+            AI đọc \texttt{backend/server.js} (\texttt{/api/apply-coupon}) và \texttt{backend/database.js} (bảng \texttt{coupons}, seed SAVE10/BIGBUY/VIP100/EXPIRED); xác định 10 biến (kể cả biến đầu ra), phân hoạch miền cho code/total\_amount/user\_id/type/expiry, chọn điểm ON/OFF/IN cho biên \texttt{min\_order\_amount}, sinh 12 ca Domain (TC-B-DT) + 6 ca BVA (TC-B-BV), bảng gap analysis (6 mục), và 5 báo cáo lỗi ứng viên (BUG-B-01..05). Khiếm khuyết trọng tâm: công thức percent \texttt{1$-$discount\_value} làm giá tăng $\sim$10 lần; biên \texttt{min\_order\_amount} dùng \texttt{>} (off-by-one); bỏ qua giới hạn dùng khi vắng \texttt{user\_id}; endpoint không xác thực; không kẹp \texttt{final\_amount} $\ge 0$.
+        } \\
+        \midrule
+        \textbf{Human review} & \\
+        \multicolumn{2}{p{\linewidth}}{%
+            Sinh viên (Lý Quốc Thạnh) chịu trách nhiệm: cần \emph{thực thi} các ca trên EShop để điền cột Kết quả/Trạng thái thực tế, chụp màn hình và tạo GitHub Issue cho từng bug đã xác nhận. Các giá trị ``dự đoán từ nguồn'' phải được kiểm chứng trước khi nộp.
+        } \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
 % Thêm các interaction tiếp theo theo cùng cấu trúc
 
 % ============================================================
