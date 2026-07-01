@@ -260,14 +260,17 @@ Mục này theo dõi phần \emph{đã làm} và phần \emph{chưa làm} của 
         \midrule
         \multicolumn{3}{l}{\textit{Feature D — FR-07 (Giỏ hàng — Mobile)}} \\
         \midrule
-        Toàn bộ chương            & \textcolor{red}{Chưa} & Chưa bắt đầu (Domain, BVA, gap, bug). \\
+        Domain + BVA (thiết kế)   & \textcolor{green!60!black}{Xong} & 14 ca DT + 7 ca BVA + gap analysis. \\
+        Thực thi + Kết quả thực   & \textcolor{red}{Chưa} & Chạy app mobile để điền Kết quả/Trạng thái thực. \\
+        Screenshot bug (D-01..04) & \textcolor{red}{Chưa} & \texttt{bug\_d\_0X.png}. \\
+        GitHub Issues (D-01..04)  & \textcolor{red}{Chưa} & Tạo issue, điền URL. \\
         \midrule
         \multicolumn{3}{l}{\textit{Hạng mục chung}} \\
         \midrule
         Chương 6 — Agent Skill    & \textcolor{orange}{Một phần} & Skill \texttt{domain-bva-test} đã có; cần viết mô tả + video demo (YouTube). \\
         Chương 7 — Test Summary   & \textcolor{red}{Chưa} & Điền số liệu sau khi thực thi (thiết kế/thực thi/pass/fail, bug theo mức độ). \\
         Phụ lục A — AI Critique   & \textcolor{red}{Chưa} & Viết 200--300 từ. \\
-        Phụ lục B — AI Audit      & \textcolor{green!60!black}{Xong} & Interaction 1 (FR-01) + 2 (FR-09) + 3 (FR-14). \\
+        Phụ lục B — AI Audit      & \textcolor{green!60!black}{Xong} & Interaction 1--4 (FR-01/09/14/07). \\
         Phụ lục C — Git Commit Log & \textcolor{red}{Chưa} & Dán output \texttt{git log} thực tế trước khi nộp. \\
         README + self-assessment  & \textcolor{red}{Chưa} & Bảng tự đánh giá + test summary (theo Mục 14 đề bài). \\
         \bottomrule
@@ -536,7 +539,7 @@ sót. Lý do bỏ sót được phân loại: \emph{chất lượng prompt}, \em
 Sáu lỗi ứng viên dưới đây được suy ra từ phân tích mã nguồn. Cần \textbf{xác nhận bằng thực
 thi}, chụp màn hình (đặt tại \texttt{figures/} hoặc \texttt{screenshots/}) và tạo GitHub Issue
 (điền URL vào ô tương ứng) trước khi nộp.
-
+ 
 \subsection{BUG-A-01: Mật khẩu mạnh (có ký tự đặc biệt) bị từ chối}
 \begin{table}[H]
     \centering
@@ -1821,6 +1824,36 @@ thi trên app}, chụp màn hình và tạo GitHub Issue trước khi nộp.
         \textbf{Human review} & \\
         \multicolumn{2}{p{\linewidth}}{%
             Sinh viên (Lý Quốc Thạnh) chịu trách nhiệm: cần \emph{thực thi} các ca trên EShop để điền cột Kết quả/Trạng thái thực tế, chụp màn hình và tạo GitHub Issue cho từng bug đã xác nhận. Các giá trị ``dự đoán từ nguồn'' phải được kiểm chứng trước khi nộp.
+        } \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+% ---- Interaction 4 ----
+\subsection*{Interaction 4 — Domain Testing \& BVA cho FR-07 (Giỏ hàng — Mobile)}
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\linewidth}{L{3.5cm} X}
+        \toprule
+        \textbf{Trường} & \textbf{Nội dung} \\
+        \midrule
+        Công cụ AI    & Claude Code (Opus 4.8) \\
+        Ngày giờ      & 2026-07-01 22:28 \\
+        Mục đích      & Áp dụng Domain Testing + BVA cho FR-07 (giỏ hàng app mobile React Native/Expo); phân tích logic giỏ trong \texttt{frontend-mobile/App.js}. \\
+        \midrule
+        \textbf{Prompt} & \\
+        \multicolumn{2}{p{\linewidth}}{%
+            \texttt{tiếp tục /domain-bva-test} — dùng skill \texttt{domain-bva-test} cho Feature D (mobile), điền trực tiếp chương Feature D của \texttt{main.tex} bằng tiếng Việt, cùng style Feature A/B/C, chế độ ``sinh viên tự chạy, AI dự đoán''.
+        } \\
+        \midrule
+        \textbf{AI Output} & \\
+        \multicolumn{2}{p{\linewidth}}{%
+            AI đọc \texttt{frontend-mobile/App.js} (\texttt{normalizeQuantity}, \texttt{addToCart}, ô sửa số lượng trong giỏ, \texttt{cartTotal}, \texttt{handleConfirmCheckout}); xác định 6 biến (gồm biến đầu ra \texttt{total\_amount}), phân hoạch miền cho quantity/ô sửa/cart.length, chọn điểm ON/OFF/IN cho biên \texttt{quantity}$>0$ và \texttt{cart.length}=1, sinh 14 ca Domain (TC-D-DT) + 7 ca BVA (TC-D-BV), gap analysis (5 mục), và 4 báo cáo lỗi ứng viên (BUG-D-01..04). Khiếm khuyết trọng tâm: ô sửa số lượng lưu \texttt{parsed+1} (off-by-one); checkout \texttt{slice(0,-1)} bỏ mất món cuối nhưng vẫn tính đủ tiền; ép âm thầm số lượng không hợp lệ về 1; không giới hạn số lượng/tồn kho.
+        } \\
+        \midrule
+        \textbf{Human review} & \\
+        \multicolumn{2}{p{\linewidth}}{%
+            Sinh viên (Lý Quốc Thạnh) chịu trách nhiệm: cần \emph{thực thi} các ca trên app mobile để điền cột Kết quả/Trạng thái thực tế, chụp màn hình và tạo GitHub Issue cho từng bug đã xác nhận. Các giá trị ``dự đoán từ nguồn'' phải được kiểm chứng trước khi nộp.
         } \\
         \bottomrule
     \end{tabularx}
