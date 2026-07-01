@@ -462,11 +462,26 @@ là một phát hiện (xem Gap Analysis).
 \end{longtable}
 
 \section{AI Gap Analysis}
-% TODO: Mô tả những test case/bug mà AI bỏ sót và lý do tại sao
-\begin{itemize}
-    \item \textbf{Gap 1:} [Mô tả gap] — Lý do: [lý do AI bỏ sót]
-    \item \textbf{Gap 2:} [Mô tả gap] — Lý do: [lý do AI bỏ sót]
-\end{itemize}
+Sau khi AI sinh bộ ca kiểm thử theo phân hoạch/biên, ta rà soát lại để tìm những ca dễ bị bỏ
+sót. Lý do bỏ sót được phân loại: \emph{chất lượng prompt}, \emph{giới hạn công cụ AI}, hoặc
+\emph{độ phức tạp nội tại của tính năng}.
+
+\begin{table}[H]
+    \centering
+    \caption{AI Gap Analysis — Feature A (FR-01)}
+    \begin{tabularx}{\linewidth}{C{0.5cm} X L{4cm} C{1.8cm}}
+        \toprule
+        \textbf{\#} & \textbf{Ca/bug bị bỏ sót} & \textbf{Lý do bỏ sót} & \textbf{Bổ sung ở TC} \\
+        \midrule
+        1 & Backend hoàn toàn không kiểm tra dữ liệu — prompt chỉ nhìn regex phía UI sẽ bỏ sót lỗ hổng khi gọi API trực tiếp. & Chất lượng prompt (chỉ tập trung tầng UI) + độ phức tạp (validation tách 2 tầng). & TC-A-DT-08/09 \\
+        2 & Mật khẩu lưu plaintext và lộ qua \texttt{GET /users/me} — đây là biến \emph{đầu ra}, không phải input. & Prompt tập trung input; giới hạn AI: không tự kiểm khía cạnh bảo mật. & TC-A-DT-12 \\
+        3 & Email trùng phá vỡ định danh khi đăng nhập (tương tác đa tính năng/trạng thái). & Độ phức tạp nội tại (cross-feature register$\to$login). & TC-A-DT-07 \\
+        4 & Đảo ngược điều kiện regex: \emph{bắt buộc khoảng trắng} và \emph{cấm ký tự đặc biệt}. Đọc chữ trợ giúp dễ giả định ngược lại. & Giới hạn công cụ + chất lượng prompt (không đọc kỹ regex thực thi). & TC-A-DT-01/02/05 \\
+        5 & Email có khoảng trắng đầu/cuối tạo bản ghi ``trùng nhưng khác'' (không chuẩn hóa). & Độ phức tạp (chuẩn hóa/locale). & EC-E5 (bổ sung) \\
+        6 & Không có giới hạn độ dài trên cho mọi trường (biên trên không xác định). & Độ phức tạp/robustness; BVA thường chỉ nhìn biên đã đặc tả. & TC-A-BV-05/06 \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
 
 \section{Bug Reports — Feature A}
 % TODO: Mô tả từng bug tìm được
