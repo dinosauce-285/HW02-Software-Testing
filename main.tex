@@ -1244,7 +1244,106 @@ công giả'' (BUG-C-04).
 \section{Bug Reports — Feature C}
 Năm lỗi ứng viên dưới đây suy ra từ phân tích mã nguồn; cần \textbf{xác nhận bằng thực thi},
 chụp màn hình và tạo GitHub Issue trước khi nộp.
-% BUGS-C-HERE
+
+\subsection{BUG-C-01: CRUD danh mục không giới hạn quyền admin}
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\linewidth}{L{3cm} X}
+        \toprule
+        \textbf{Trường} & \textbf{Nội dung} \\
+        \midrule
+        Bug ID       & BUG-C-01 \\
+        Tính năng    & FR-14 \quad\textbf{Kỹ thuật:} Domain \\
+        Mức độ       & Critical \\
+        Mô tả        & \texttt{authenticateToken} chỉ kiểm JWT hợp lệ, không kiểm \texttt{role="admin"}; mọi tài khoản đăng nhập đều tạo/sửa/xóa danh mục. Kèm theo, \texttt{PUT /api/users/me} cho phép tự đặt \texttt{role} $\Rightarrow$ tự nâng quyền. \\
+        Tái hiện     & 1. Đăng nhập tài khoản \texttt{role='user'}. \newline 2. Gọi \texttt{POST /api/categories} với token đó. \newline 3. Quan sát danh mục được tạo. \\
+        Expected     & \texttt{403 Forbidden} cho tài khoản không phải admin. \\
+        Actual       & \texttt{200 ``Category created''} (dự đoán từ nguồn). \\
+        GitHub Issue & \url{https://github.com/[group]/eshop-sut/issues/[number]} \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+% \begin{figure}[H]\centering\includegraphics[width=0.8\linewidth]{bug_c_01.png}\caption{Screenshot — BUG-C-01}\end{figure}
+
+\subsection{BUG-C-02: Không kiểm tra tên danh mục (rỗng/NULL được chấp nhận)}
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\linewidth}{L{3cm} X}
+        \toprule
+        \textbf{Trường} & \textbf{Nội dung} \\
+        \midrule
+        Bug ID       & BUG-C-02 \\
+        Tính năng    & FR-14 \quad\textbf{Kỹ thuật:} Domain + BVA \\
+        Mức độ       & Major \\
+        Mô tả        & \texttt{POST/PUT} không kiểm \texttt{name}; tên rỗng, chỉ khoảng trắng, hoặc thiếu trường (\texttt{NULL}) đều được lưu. \\
+        Tái hiện     & 1. \texttt{POST /api/categories} với body \texttt{\{name:""\}} hoặc \texttt{\{\}}. \\
+        Expected     & \texttt{400 Bad Request}. \\
+        Actual       & \texttt{200 ``Category created''}, tạo danh mục rỗng/NULL (dự đoán từ nguồn). \\
+        GitHub Issue & \url{https://github.com/[group]/eshop-sut/issues/[number]} \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+% \begin{figure}[H]\centering\includegraphics[width=0.8\linewidth]{bug_c_02.png}\caption{Screenshot — BUG-C-02}\end{figure}
+
+\subsection{BUG-C-03: Cho phép tên danh mục trùng lặp}
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\linewidth}{L{3cm} X}
+        \toprule
+        \textbf{Trường} & \textbf{Nội dung} \\
+        \midrule
+        Bug ID       & BUG-C-03 \\
+        Tính năng    & FR-14 \quad\textbf{Kỹ thuật:} Domain \\
+        Mức độ       & Minor \\
+        Mô tả        & Cột \texttt{name} không \texttt{UNIQUE}; tạo trùng tên danh mục đã tồn tại vẫn thành công, gây nhập nhằng khi lọc sản phẩm. \\
+        Tái hiện     & 1. \texttt{POST /api/categories} với \texttt{\{name:"Laptop"\}} (đã có trong seed). \\
+        Expected     & Từ chối vì tên đã tồn tại. \\
+        Actual       & Tạo thêm danh mục ``Laptop'' thứ hai (dự đoán từ nguồn). \\
+        GitHub Issue & \url{https://github.com/[group]/eshop-sut/issues/[number]} \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+% \begin{figure}[H]\centering\includegraphics[width=0.8\linewidth]{bug_c_03.png}\caption{Screenshot — BUG-C-03}\end{figure}
+
+\subsection{BUG-C-04: Sửa/xóa id không tồn tại vẫn trả về thành công}
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\linewidth}{L{3cm} X}
+        \toprule
+        \textbf{Trường} & \textbf{Nội dung} \\
+        \midrule
+        Bug ID       & BUG-C-04 \\
+        Tính năng    & FR-14 \quad\textbf{Kỹ thuật:} BVA \\
+        Mức độ       & Minor \\
+        Mô tả        & \texttt{PUT/DELETE} không kiểm \texttt{this.changes}; với \texttt{id} không tồn tại (0, 4, 999) hoặc không phải số, \texttt{UPDATE/DELETE} tác động 0 dòng nhưng vẫn trả \texttt{200 ``updated/deleted''}. \\
+        Tái hiện     & 1. \texttt{DELETE /api/categories/999} (hoặc \texttt{/0}, \texttt{/abc}). \\
+        Expected     & \texttt{404 Not Found}. \\
+        Actual       & \texttt{200 ``Category deleted''} dù không có gì bị xóa (dự đoán từ nguồn). \\
+        GitHub Issue & \url{https://github.com/[group]/eshop-sut/issues/[number]} \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+% \begin{figure}[H]\centering\includegraphics[width=0.8\linewidth]{bug_c_04.png}\caption{Screenshot — BUG-C-04}\end{figure}
+
+\subsection{BUG-C-05: Xóa danh mục làm mồ côi sản phẩm (mất toàn vẹn tham chiếu)}
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\linewidth}{L{3cm} X}
+        \toprule
+        \textbf{Trường} & \textbf{Nội dung} \\
+        \midrule
+        Bug ID       & BUG-C-05 \\
+        Tính năng    & FR-14 \quad\textbf{Kỹ thuật:} Domain \\
+        Mức độ       & Major \\
+        Mô tả        & \texttt{products.category\_id} không có khóa ngoại tới \texttt{categories}; xóa một danh mục đang được sản phẩm tham chiếu để lại \texttt{category\_id} trỏ tới danh mục không còn tồn tại (sản phẩm mồ côi), không cascade, không chặn. \\
+        Tái hiện     & 1. \texttt{DELETE /api/categories/1} (danh mục ``Điện thoại'' có 2 sản phẩm). \newline 2. \texttt{GET /api/products} kiểm tra \texttt{category\_id=1}. \\
+        Expected     & Chặn xóa khi còn sản phẩm, hoặc cascade/di chuyển sản phẩm. \\
+        Actual       & Xóa thành công, 2 sản phẩm còn \texttt{category\_id=1} trỏ tới danh mục đã mất (dự đoán từ nguồn). \\
+        GitHub Issue & \url{https://github.com/[group]/eshop-sut/issues/[number]} \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+% \begin{figure}[H]\centering\includegraphics[width=0.8\linewidth]{bug_c_05.png}\caption{Screenshot — BUG-C-05}\end{figure}
 
 % ============================================================
 %  CHƯƠNG 5: FEATURE D — POOL D (MOBILE)
