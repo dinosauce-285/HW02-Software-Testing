@@ -216,5 +216,32 @@ password length $\ge 8$ & \texttt{Aa1 bcdefgh} (11) $\to$ Accept & \verb|""| (le
 boundary (length is correct); the divergences appear only when the class conditions are
 varied (Step~7).
 
+% ------------------------------------------------------------
+\section{Step 6 --- Boundary Value Analysis test values}
+\label{sec:bva}
+3-value BVA around the single numeric boundary (min $=8$). Values \texttt{min-1, min,
+min+1}. There is no documented maximum, so the upper 3-value triple is replaced by an
+\emph{undefined-max} probe (a very long password) that doubles as a robustness / output
+boundary check. All values hold the other regex conditions constant.
+
+\begin{center}
+\begin{tabular}{L{1.7cm} L{2.0cm} L{3.6cm} L{2.2cm} L{3.4cm}}
+\toprule
+\textbf{Case} & \textbf{Boundary} & \textbf{Value (length)} & \textbf{Expected} & \textbf{Predicted (source)} \\
+\midrule
+min$-1$ & 7  & \texttt{Aa1 bcd} (7)   & Reject & Reject (regex fails) \\
+min     & 8  & \texttt{Aa1 bcde} (8)  & Accept & Accept \\
+min$+1$ & 9  & \texttt{Aa1 bcdef} (9) & Accept & Accept \\
+\midrule
+max (undefined) & --- & \texttt{Aa1 } + 99{,}996 chars & Reject or capped & Accept (no max; whole string persisted) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent The three length values behave correctly. The \emph{undefined-max} row is the
+interesting one: with no maximum, an arbitrarily long password is accepted and stored,
+which a correct implementation should bound. It is carried into Step~7 as a test case and
+into Step~8 as a gap.
+
 % APPEND-BELOW
 \end{document}
