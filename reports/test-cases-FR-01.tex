@@ -1,0 +1,120 @@
+% ============================================================
+%  HW02 - Domain Testing on EShop
+%  FR-01 Account Registration -- Domain Testing & Boundary Value Analysis
+%  Standalone report; compile with pdflatex (T5 + babel for Vietnamese strings).
+% ============================================================
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T5]{fontenc}
+\usepackage{lmodern}
+\usepackage[vietnamese,english]{babel}
+\usepackage[margin=2cm]{geometry}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage[table,dvipsnames]{xcolor}
+\usepackage{verbatim}
+\usepackage[hidelinks]{hyperref}
+
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcommand{\ec}[1]{\textbf{#1}}
+
+\title{HW02 Domain Testing --- FR-01 Account Registration\\[2pt]
+\large Domain Testing \& Boundary Value Analysis}
+\author{Group Software-Testing-G02}
+\date{2026-07-01}
+
+\begin{document}
+\maketitle
+
+\section*{Feature under test}
+\textbf{FR-01 --- Account registration} (Pool A). Registration is implemented in two
+layers:
+\begin{itemize}[leftmargin=*]
+  \item \textbf{UI layer:} \texttt{frontend-web/src/pages/Register.jsx} --- a form with
+  \emph{name}, \emph{email}, \emph{password}. It performs the \emph{only} validation in the
+  whole feature: a client-side ``strong password'' regular expression. On success it
+  \texttt{POST}s to the API and navigates to \texttt{/login}.
+  \item \textbf{API layer:} \texttt{POST /api/register} (\texttt{backend/server.js}) ---
+  inserts \verb|{name, email, password}| straight into the \texttt{users} table with
+  \emph{no} validation, \emph{no} uniqueness check and the password stored in plain text.
+\end{itemize}
+
+\noindent\textbf{Stated password rule} (UI help text, \texttt{Register.jsx}):
+\begin{quote}
+``T\'ối thiểu 8 k\'ý tự, c\'ó chữ hoa, chữ thường, số v\`a k\'ý tự đặc biệt.''
+(\emph{At least 8 characters, with uppercase, lowercase, a digit and a \textbf{special
+character}.})
+\end{quote}
+
+\noindent\textbf{Actually enforced client regex} (\texttt{Register.jsx}, line 15):
+\begin{verbatim}
+/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\s)[A-Za-z\d\s]{8,}$/
+\end{verbatim}
+This regex requires a \textbf{whitespace} character (\verb|(?=.*\s)|) and, because the
+character class is \verb|[A-Za-z\d\s]|, \textbf{forbids every special character}. It is the
+exact opposite of the stated rule and is the central defect this report targets.
+
+\paragraph{Legend for the test tables.}
+Because execution is performed by the student against a running EShop, each case carries an
+\textbf{Expected (per spec)} value --- what a correct implementation should do --- and a
+\textbf{Predicted (source analysis)} value --- what the current code will do, derived by
+reading the source (\emph{not} an executed result). The \textbf{Actual / Pass--Fail} column
+is intentionally left blank in the source; it is filled after running the tests. Any case
+whose Predicted value diverges from Expected is a candidate bug.
+
+% ------------------------------------------------------------
+\section{Step 1 --- Identify variables}
+\label{sec:vars}
+Every input and output of the registration feature, including implicit variables (field
+length, password character classes, uniqueness, persisted representation).
+
+\begin{center}
+\begin{tabular}{L{2.6cm} L{2.3cm} L{1.7cm} L{7.8cm}}
+\toprule
+\textbf{Variable} & \textbf{Type} & \textbf{I/O} & \textbf{Notes} \\
+\midrule
+name       & string (TEXT)  & Input  & UI: HTML \texttt{required}. No length/format rule. Backend: none. \\
+email      & string (TEXT)  & Input  & UI: \texttt{required}, but \texttt{type="text"} $\Rightarrow$ no format check. Backend: none; column \emph{not} \texttt{UNIQUE}. \\
+password   & string (TEXT)  & Input  & Only validated by the client regex above. Backend: none; stored in plain text. \\
+password length     & integer (derived) & Input & Ordered variable; boundary at 8 (regex \verb|{8,}|). \\
+has\_lower / has\_upper / has\_digit & boolean (derived) & Input & Character-class conditions of the regex. \\
+has\_whitespace     & boolean (derived) & Input & Regex \emph{requires} it (defect). \\
+has\_special\_char  & boolean (derived) & Input & Regex \emph{forbids} it (defect); spec requires it. \\
+email uniqueness    & boolean (derived) & Input & Whether the email already exists; never checked. \\
+\midrule
+HTTP status         & integer & Output & \texttt{200} on insert, \texttt{500} only on a DB error (none reachable). \\
+response body       & JSON    & Output & \verb|{message, id}| or \verb|{error}|. \\
+client error msg    & string  & Output & ``Mật khẩu qu\'á yếu\ldots'' when regex fails. \\
+persisted row       & DB row  & Output & \texttt{id, name, email, password(plaintext), role='user'}. \\
+navigation          & route   & Output & Redirect to \texttt{/login} on success. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ------------------------------------------------------------
+\section{Step 2 --- Characterise each variable's domain}
+\label{sec:domains}
+For each input, the \emph{valid} domain per the intended specification and the constraint
+\emph{actually} enforced by the code.
+
+\begin{center}
+\begin{tabular}{L{2.3cm} L{6.2cm} L{6.4cm}}
+\toprule
+\textbf{Variable} & \textbf{Valid domain (intended spec)} & \textbf{Constraint actually enforced} \\
+\midrule
+name     & Non-empty, human name; reasonable length (e.g. 1--100 chars). & UI blocks empty (\texttt{required}); whitespace-only passes. API accepts anything incl.\ \texttt{NULL}. No max length. \\
+email    & Non-empty, valid email syntax (\texttt{local@domain.tld}), unique across users. & UI blocks empty only. No syntax check anywhere. No uniqueness check (column not \texttt{UNIQUE}). Leading/trailing spaces not trimmed. \\
+password & $\ge 8$ chars \emph{and} contains lowercase, uppercase, digit \emph{and} a special character. & Client regex: $\ge 8$ chars \emph{and} lowercase \emph{and} uppercase \emph{and} digit \emph{and} \textbf{whitespace}, using only \verb|[A-Za-z\d\s]| (\textbf{special chars rejected}). API: no rule at all. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent The mismatch between columns 2 and 3 for \emph{password} (whitespace required
+instead of special char; specials forbidden) and for \emph{email} (no syntax/uniqueness)
+is the raw material for the partitions in Step~3.
+
+% APPEND-BELOW
+\end{document}
