@@ -421,16 +421,21 @@ học. Vì vậy Domain Testing phát hiện nhiều lỗi hơn BVA thuần túy
 \section{Boundary Value Analysis (BVA)}
 
 \subsection{Bước 1: Xác Định Ranh Giới (Boundaries)}
-% TODO: Với mỗi biến, xác định các giá trị biên
+Chỉ có \texttt{password.length} là biên số học được xác định rõ ($\ge 8$). \texttt{name} và
+\texttt{email} chỉ có biên dưới ``khác rỗng'' (do UI \texttt{required}); \emph{không} có biên
+trên nào được đặc tả hay cưỡng chế (SQLite \texttt{TEXT} không giới hạn) — bản thân điều này
+là một phát hiện (xem Gap Analysis).
+
 \begin{table}[H]
     \centering
-    \caption{Bảng giá trị biên — Feature A}
-    \begin{tabularx}{\linewidth}{L{2.5cm} C{2cm} C{2cm} C{2cm} C{2cm} L{3cm}}
+    \caption{Bảng giá trị biên — Feature A (FR-01)}
+    \begin{tabularx}{\linewidth}{L{3cm} C{1.6cm} C{1.6cm} C{1.8cm} C{2.4cm} X}
         \toprule
         \textbf{Biến} & \textbf{Min} & \textbf{Min+1} & \textbf{Max-1} & \textbf{Max} & \textbf{Ghi chú} \\
         \midrule
-        [Biến 1] & & & & & \\
-        [Biến 2] & & & & & \\
+        password.length & 8 & 9 & --- & --- (không có max) & Biên dưới đúng; off-point $=7$; không có biên trên. \\
+        name.length     & 1 & 2 & --- & --- (không có max) & Chỉ \texttt{required} chặn rỗng ở UI. \\
+        email.length    & 1 & 2 & --- & --- (không có max) & Tương tự; backend nhận cả \texttt{NULL}. \\
         \bottomrule
     \end{tabularx}
 \end{table}
