@@ -301,20 +301,66 @@ email).
 \end{table}
 
 \subsection{Bước 2: Phân Hoạch Miền (Domain Partitioning)}
-% TODO: Với mỗi biến, xác định các miền hợp lệ/không hợp lệ
-\subsubsection{Biến 1: [Tên biến]}
+Mỗi biến được chia thành các lớp tương đương hợp lệ/không hợp lệ (có mã EC). Dấu \emph{*}
+đánh dấu lớp mà một hệ thống \emph{đúng} phải xử lý theo đặc tả nhưng mã hiện tại làm sai.
+
+\subsubsection{Biến name}
 \begin{table}[H]
     \centering
-    \caption{Phân hoạch miền — Biến 1}
-    \begin{tabularx}{\linewidth}{L{3cm} L{3cm} L{3cm} L{4cm}}
+    \caption{Phân hoạch miền — name}
+    \begin{tabularx}{\linewidth}{C{1.4cm} L{6cm} C{1.6cm} X}
         \toprule
-        \textbf{Miền} & \textbf{Điều kiện} & \textbf{Loại} & \textbf{Ví dụ} \\
+        \textbf{EC} & \textbf{Điều kiện} & \textbf{Loại} & \textbf{Ví dụ} \\
         \midrule
-        Valid   & [điều kiện] & Valid   & [ví dụ] \\
-        Invalid & [điều kiện] & Invalid & [ví dụ] \\
+        EC-N1 & Tên thường, không rỗng & Valid & \texttt{Nguyen Van A} \\
+        EC-N2 & Rỗng & Invalid & \verb|""| \\
+        EC-N3 & Chỉ khoảng trắng & Invalid & \verb|"   "| \\
+        EC-N4 & Rất dài (không có max) & Valid* & 100.000 ký tự \\
         \bottomrule
     \end{tabularx}
 \end{table}
+
+\subsubsection{Biến email}
+\begin{table}[H]
+    \centering
+    \caption{Phân hoạch miền — email}
+    \begin{tabularx}{\linewidth}{C{1.4cm} L{6cm} C{1.6cm} X}
+        \toprule
+        \textbf{EC} & \textbf{Điều kiện} & \textbf{Loại} & \textbf{Ví dụ} \\
+        \midrule
+        EC-E1 & Đúng định dạng, chưa dùng & Valid & \texttt{new@domain.com} \\
+        EC-E2 & Sai định dạng & Invalid & \texttt{notanemail} \\
+        EC-E3 & Rỗng & Invalid & \verb|""| \\
+        EC-E4 & Trùng email đã tồn tại & Invalid & \texttt{test@eshop.com} \\
+        EC-E5 & Có khoảng trắng bao quanh & Invalid & \verb|" test@eshop.com "| \\
+        EC-E6 & Payload dạng SQL-injection & Invalid & \texttt{x'; DROP TABLE users;-{}-} \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\subsubsection{Biến password}
+\begin{table}[H]
+    \centering
+    \caption{Phân hoạch miền — password}
+    \begin{tabularx}{\linewidth}{C{1.4cm} L{6cm} C{1.6cm} X}
+        \toprule
+        \textbf{EC} & \textbf{Điều kiện} & \textbf{Loại} & \textbf{Ví dụ} \\
+        \midrule
+        EC-P1 & Qua được regex (có ws, không ký tự đặc biệt, $\ge 8$) & Valid* & \texttt{Passw0rd 1} \\
+        EC-P2 & Mạnh đúng đặc tả (hoa+thường+số+đặc biệt, không ws) & Spec-valid & \texttt{Password123!} \\
+        EC-P3 & Thiếu chữ thường & Invalid & \texttt{PASSW0RD 1} \\
+        EC-P4 & Thiếu chữ hoa & Invalid & \texttt{passw0rd 1} \\
+        EC-P5 & Thiếu chữ số & Invalid & \texttt{Password x} \\
+        EC-P6 & Thiếu khoảng trắng (điều kiện lỗi) & Invalid & \texttt{Password1} \\
+        EC-P7 & Có ký tự đặc biệt & Invalid & \texttt{Passw0rd !} \\
+        EC-P8 & Độ dài $<8$ & Invalid & \texttt{Aa1 bcd} \\
+        EC-P9 & Rỗng & Invalid & \verb|""| \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\noindent\emph{Spec-valid} = đúng đặc tả nhưng bị mã \emph{từ chối}; \emph{Valid*} = mã
+\emph{chấp nhận} dù sai đặc tả. Hai lớp EC-P1 và EC-P2 chính là nơi lỗi biểu hiện rõ nhất.
 
 \subsection{Bước 3: Chọn Điểm Kiểm Thử (Test Point Selection)}
 % TODO: Áp dụng chiến lược ON/OFF/IN points
