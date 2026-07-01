@@ -228,10 +228,52 @@
 % ============================================================
 %  CHƯƠNG 2: FEATURE A — POOL A
 % ============================================================
-\chapter{Feature A — [Tên tính năng] (Pool A)}
+\chapter{Feature A — Đăng ký tài khoản (Pool A)}
 
 \section{Mô Tả Tính Năng}
-% TODO: Mô tả chi tiết tính năng, input/output, constraints
+Tính năng \textbf{FR-01 — Đăng ký tài khoản} cho phép người dùng tạo tài khoản mới bằng
+\emph{họ tên}, \emph{email} và \emph{mật khẩu}. Nó được cài đặt qua hai tầng:
+
+\begin{itemize}
+    \item \textbf{Tầng giao diện (UI):} \texttt{frontend-web/src/pages/Register.jsx} — biểu mẫu
+    với ba trường. Đây là nơi \emph{duy nhất} có kiểm tra dữ liệu: một biểu thức chính quy
+    (regex) kiểm tra ``mật khẩu mạnh'' phía client. Khi hợp lệ, nó gửi \texttt{POST} tới API
+    rồi chuyển sang trang \texttt{/login}.
+    \item \textbf{Tầng API:} \texttt{POST /api/register} (\texttt{backend/server.js}) — chèn
+    thẳng \verb|{name, email, password}| vào bảng \texttt{users}, \emph{không} kiểm tra hợp lệ,
+    \emph{không} kiểm tra trùng lặp, và lưu mật khẩu ở dạng \textbf{văn bản thuần (plaintext)}.
+\end{itemize}
+
+\noindent\textbf{Đầu vào (input):} \texttt{name} (string), \texttt{email} (string),
+\texttt{password} (string).\\
+\textbf{Đầu ra (output):} mã HTTP (\texttt{200}/\texttt{500}), body JSON
+(\verb|{message, id}| hoặc \verb|{error}|), thông báo lỗi phía client, bản ghi được lưu trong
+DB (kèm mật khẩu plaintext, \texttt{role='user'}), và điều hướng sang \texttt{/login}.
+
+\vspace{4pt}
+\noindent\textbf{Ràng buộc mật khẩu theo đặc tả} (chữ trợ giúp trong \texttt{Register.jsx}):
+\emph{``Tối thiểu 8 ký tự, có chữ hoa, chữ thường, số và ký tự đặc biệt.''}
+Tuy nhiên regex thực tế được cài đặt là:
+
+\begin{lstlisting}[language=,caption={Regex kiểm tra mật khẩu (Register.jsx)}]
+/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\s)[A-Za-z\d\s]{8,}$/
+\end{lstlisting}
+
+\begin{notebox}
+Regex này \textbf{bắt buộc có khoảng trắng} (\texttt{(?=.*\textbackslash s)}) và, do lớp ký tự
+là \texttt{[A-Za-z\textbackslash d\textbackslash s]}, nó \textbf{cấm mọi ký tự đặc biệt} — ngược
+hoàn toàn với đặc tả (vốn yêu cầu \emph{phải có} ký tự đặc biệt). Đây là khiếm khuyết trọng tâm
+mà chương này nhắm tới. Hệ quả: mật khẩu mạnh như \texttt{Password123!} bị \emph{từ chối}, còn
+mật khẩu yếu như \texttt{Passw0rd 1} lại được \emph{chấp nhận}.
+\end{notebox}
+
+\begin{notebox}
+\textbf{Quy ước cột kết quả.} Do thực thi được sinh viên chạy trực tiếp trên EShop, cột
+\emph{Kết quả} và \emph{Trạng thái} ghi giá trị \textbf{dự đoán từ phân tích mã nguồn} (chưa
+phải kết quả chạy thật); sẽ được xác nhận lại sau khi thực thi và chụp màn hình. Cột
+\emph{Expected} là hành vi \emph{đúng theo đặc tả}. Ca nào dự đoán khác Expected là ứng viên
+lỗi (bug).
+\end{notebox}
 
 \section{Domain Testing}
 
