@@ -37,7 +37,7 @@
 - **Expected:** Đăng ký thành công, chuyển tới `/login`.
 - **Actual:** Báo lỗi "Mật khẩu quá yếu!" ngay dưới form; không đăng ký được.
 - **Screenshot:** `figures/bug_a_01.png`
-- **GitHub Issue:** ⬜ _[dán URL]_
+- **GitHub Issue:** https://github.com/dinosauce-285/Software-Testing-G02/issues/1
 
 ### BUG-A-02 — Mật khẩu yếu (không có ký tự đặc biệt) được chấp nhận
 - **Title:** `BUG-A-02: Weak password without special char is accepted`
@@ -51,7 +51,7 @@
 - **Expected:** Từ chối (thiếu ký tự đặc biệt).
 - **Actual:** Đăng ký thành công, chuyển sang `/login`.
 - **Screenshot:** `figures/bug_a_02.png`
-- **GitHub Issue:** ⬜ _[dán URL]_
+- **GitHub Issue:** https://github.com/dinosauce-285/Software-Testing-G02/issues/2
 
 ### BUG-A-03 — Email sai định dạng được chấp nhận
 - **Title:** `BUG-A-03: Malformed email is accepted at registration`
@@ -64,7 +64,7 @@
 - **Expected:** Từ chối vì email không hợp lệ.
 - **Actual:** Đăng ký thành công, chuyển sang `/login`.
 - **Screenshot:** `figures/bug_a_03.png`
-- **GitHub Issue:** ⬜ _[dán URL]_
+- **GitHub Issue:** https://github.com/dinosauce-285/Software-Testing-G02/issues/3
 
 ### BUG-A-04 — Cho phép email trùng lặp
 - **Title:** `BUG-A-04: Duplicate email allowed (email column not UNIQUE)`
@@ -79,7 +79,7 @@
 - **Actual:** Form không báo lỗi, chuyển sang `/login`; tab "Người dùng" hiển thị *hai* tài
   khoản cùng email `test@eshop.com`.
 - **Screenshot:** `figures/bug_a_04.png`
-- **GitHub Issue:** ⬜ _[dán URL]_
+- **GitHub Issue:** https://github.com/dinosauce-285/Software-Testing-G02/issues/4
 
 ---
 
@@ -97,7 +97,7 @@
 - **Expected:** Giảm 40.000, còn 360.000.
 - **Actual:** Màn hình hiện "Tiết kiệm −3.600.000 ₫", "Thành tiền 4.000.000 ₫" — đắt gấp 10 lần.
 - **Screenshot:** `figures/bug_b_01.png`
-- **GitHub Issue:** ⬜ _[dán URL]_
+- **GitHub Issue:** https://github.com/dinosauce-285/Software-Testing-G02/issues/5
 
 ### BUG-B-02 — Đơn bằng đúng mức tối thiểu bị từ chối (off-by-one)
 - **Title:** `BUG-B-02: Order exactly at min_order_amount rejected (off-by-one)`
@@ -111,7 +111,7 @@
 - **Expected:** Chấp nhận (đơn đủ mức tối thiểu), Thành tiền 200.000.
 - **Actual:** Báo lỗi đỏ "Đơn hàng chưa đủ giá trị tối thiểu…" dù đơn bằng đúng mức.
 - **Screenshot:** `figures/bug_b_02.png`
-- **GitHub Issue:** ⬜ _[dán URL]_
+- **GitHub Issue:** https://github.com/dinosauce-285/Software-Testing-G02/issues/6
 
 ### BUG-B-03 — Khách (guest) không bị giới hạn số lần dùng mã
 - **Title:** `BUG-B-03: Guest checkout bypasses max_uses_per_user`
@@ -125,7 +125,7 @@
 - **Expected:** Bị chặn theo `max_uses_per_user`.
 - **Actual:** Mã luôn áp dụng được cho khách, không lần nào bị chặn.
 - **Screenshot:** `figures/bug_b_03.png`
-- **GitHub Issue:** ⬜ _[dán URL]_
+- **GitHub Issue:** https://github.com/dinosauce-285/Software-Testing-G02/issues/7
 
 ### BUG-B-04 — Không chặn "Thành tiền" âm với mã fixed
 - **Title:** `BUG-B-04: final total not clamped ≥ 0 for fixed coupons`
@@ -139,7 +139,7 @@
 - **Expected:** "Thành tiền" được kẹp ≥ 0 và hợp lý.
 - **Actual:** "Thành tiền" hiển thị −40.000 ₫ (âm, không kẹp).
 - **Screenshot:** `figures/bug_b_04.png`
-- **GitHub Issue:** ⬜ _[dán URL]_
+- **GitHub Issue:** https://github.com/dinosauce-285/Software-Testing-G02/issues/8
 
 ---
 
@@ -157,7 +157,7 @@
 - **Expected:** Chặn và báo lỗi; không tạo danh mục tên rỗng.
 - **Actual:** Một hàng danh mục mới với ô Tên trống xuất hiện trong bảng.
 - **Screenshot:** `figures/bug_c_01.png`
-- **GitHub Issue:** ⬜ _[dán URL]_
+- **GitHub Issue:** https://github.com/dinosauce-285/Software-Testing-G02/issues/9
 
 ### BUG-C-02 — Cho phép thêm tên danh mục trùng lặp
 - **Title:** `BUG-C-02: Duplicate category name allowed`
@@ -171,7 +171,7 @@
 - **Expected:** Từ chối vì tên đã tồn tại.
 - **Actual:** Bảng hiển thị hai danh mục cùng tên "Laptop".
 - **Screenshot:** `figures/bug_c_02.png`
-- **GitHub Issue:** ⬜ _[dán URL]_
+- **GitHub Issue:** https://github.com/dinosauce-285/Software-Testing-G02/issues/10
 
 ### BUG-C-03 — Xóa danh mục đang có sản phẩm làm sản phẩm mồ côi
 - **Title:** `BUG-C-03: Deleting a category orphans its products`
@@ -187,7 +187,7 @@
 - **Actual:** Danh mục biến mất ngay; các sản phẩm vẫn còn nhưng thuộc danh mục không còn tồn
   tại (mồ côi).
 - **Screenshot:** `figures/bug_c_03.png`
-- **GitHub Issue:** ⬜ _[dán URL]_
+- **GitHub Issue:** https://github.com/dinosauce-285/Software-Testing-G02/issues/11
 
 ### BUG-C-04 — Ô "Tên danh mục" không giới hạn độ dài
 - **Title:** `BUG-C-04: Category name field has no length limit`
@@ -201,7 +201,7 @@
 - **Expected:** Giới hạn độ dài hợp lý / từ chối khi vượt.
 - **Actual:** Danh mục được tạo với toàn bộ chuỗi, hiển thị tràn trong bảng.
 - **Screenshot:** `figures/bug_c_04.png`
-- **GitHub Issue:** ⬜ _[dán URL]_
+- **GitHub Issue:** https://github.com/dinosauce-285/Software-Testing-G02/issues/12
 
 ---
 
@@ -219,7 +219,7 @@
 - **Expected:** Số lượng = 2.
 - **Actual:** Ô số lượng nhảy thành 3, "Thành tiền" tính theo 3.
 - **Screenshot:** `figures/bug_d_01.png`
-- **GitHub Issue:** ⬜ _[dán URL]_
+- **GitHub Issue:** https://github.com/dinosauce-285/Software-Testing-G02/issues/13
 
 ### BUG-D-02 — Checkout bỏ mất món cuối nhưng vẫn tính đủ tiền
 - **Title:** `BUG-D-02: Checkout drops last cart item but still charges full total`
@@ -234,7 +234,7 @@
 - **Actual:** App gửi chỉ 2 món (bỏ món cuối) nhưng vẫn thu tiền của cả 3; app không có màn chi
   tiết đơn nên sai lệch bị che khuất (vùng xám).
 - **Screenshot:** `figures/bug_d_02.png`
-- **GitHub Issue:** ⬜ _[dán URL]_
+- **GitHub Issue:** https://github.com/dinosauce-285/Software-Testing-G02/issues/14
 
 ### BUG-D-03 — Số lượng không hợp lệ bị âm thầm ép về 1
 - **Title:** `BUG-D-03: Invalid quantity silently coerced to 1`
@@ -247,7 +247,7 @@
 - **Expected:** Báo lỗi/không cho thêm với số lượng không hợp lệ.
 - **Actual:** Giỏ âm thầm hiện số lượng 1 (hoặc phần nguyên), không cảnh báo.
 - **Screenshot:** `figures/bug_d_03.png`
-- **GitHub Issue:** ⬜ _[dán URL]_
+- **GitHub Issue:** https://github.com/dinosauce-285/Software-Testing-G02/issues/15
 
 ### BUG-D-04 — Không giới hạn số lượng / không kiểm tồn kho
 - **Title:** `BUG-D-04: No max quantity / stock limit`
@@ -260,4 +260,4 @@
 - **Expected:** Giới hạn theo tồn kho / mức tối đa hợp lý.
 - **Actual:** Giỏ nhận toàn bộ, "Thành tiền" hiện số cực lớn phi lý.
 - **Screenshot:** `figures/bug_d_04.png`
-- **GitHub Issue:** ⬜ _[dán URL]_
+- **GitHub Issue:** https://github.com/dinosauce-285/Software-Testing-G02/issues/16

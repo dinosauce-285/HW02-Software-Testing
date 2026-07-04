@@ -560,7 +560,7 @@ Người dùng của app admin cho ca email trùng). Cần \textbf{xác nhận b
         Tái hiện     & 1. Mở trang Đăng ký. \newline 2. Nhập name/email hợp lệ. \newline 3. Nhập mật khẩu \texttt{Password123!}. \newline 4. Bấm ``Đăng Ký''. \\
         Expected     & Đăng ký thành công, chuyển tới \texttt{/login}. \\
         Actual       & Báo lỗi ``Mật khẩu quá yếu!'' ngay dưới form; không đăng ký được. \\
-        GitHub Issue & \url{https://github.com/[group]/eshop-sut/issues/[number]} \\
+        GitHub Issue & \url{https://github.com/dinosauce-285/Software-Testing-G02/issues/1} \\
         \bottomrule
     \end{tabularx}
 \end{table}
@@ -580,7 +580,7 @@ Người dùng của app admin cho ca email trùng). Cần \textbf{xác nhận b
         Tái hiện     & 1. Mở trang Đăng ký. \newline 2. Nhập name/email hợp lệ. \newline 3. Nhập mật khẩu \texttt{Passw0rd 1}. \newline 4. Bấm ``Đăng Ký''. \\
         Expected     & Từ chối (thiếu ký tự đặc biệt). \\
         Actual       & Đăng ký thành công, chuyển sang \texttt{/login}. \\
-        GitHub Issue & \url{https://github.com/[group]/eshop-sut/issues/[number]} \\
+        GitHub Issue & \url{https://github.com/dinosauce-285/Software-Testing-G02/issues/2} \\
         \bottomrule
     \end{tabularx}
 \end{table}
@@ -600,7 +600,7 @@ Người dùng của app admin cho ca email trùng). Cần \textbf{xác nhận b
         Tái hiện     & 1. Mở trang Đăng ký. \newline 2. Nhập email \texttt{notanemail}, mật khẩu \texttt{Passw0rd 1}. \newline 3. Bấm ``Đăng Ký''. \\
         Expected     & Từ chối vì email không hợp lệ. \\
         Actual       & Đăng ký thành công, chuyển sang \texttt{/login}. \\
-        GitHub Issue & \url{https://github.com/[group]/eshop-sut/issues/[number]} \\
+        GitHub Issue & \url{https://github.com/dinosauce-285/Software-Testing-G02/issues/3} \\
         \bottomrule
     \end{tabularx}
 \end{table}
@@ -620,7 +620,7 @@ Người dùng của app admin cho ca email trùng). Cần \textbf{xác nhận b
         Tái hiện     & 1. Mở trang Đăng ký, nhập \texttt{test@eshop.com} (đã tồn tại) + mật khẩu hợp lệ, bấm ``Đăng Ký''. \newline 2. Đăng nhập app admin, mở tab ``Người dùng''. \newline 3. Quan sát danh sách. \\
         Expected     & Form từ chối vì email đã tồn tại. \\
         Actual       & Form không báo lỗi, chuyển sang \texttt{/login}; tab Người dùng hiển thị \emph{hai} tài khoản cùng email \texttt{test@eshop.com}. \\
-        GitHub Issue & \url{https://github.com/[group]/eshop-sut/issues/[number]} \\
+        GitHub Issue & \url{https://github.com/dinosauce-285/Software-Testing-G02/issues/4} \\
         \bottomrule
     \end{tabularx}
 \end{table}
@@ -976,7 +976,7 @@ functional testing từ UI --- đã loại; phần khách vãng lai né giới h
         Tái hiện     & 1. Thêm hàng để tổng $=400.000$. \newline 2. Nhập mã \texttt{SAVE10}. \newline 3. Bấm áp dụng. \\
         Expected     & Giảm 40.000, còn 360.000. \\
         Actual       & Màn hình hiện ``Tiết kiệm $-3.600.000$ ₫'', ``Thành tiền 4.000.000 ₫'' --- đắt gấp 10 lần. \\
-        GitHub Issue & \url{https://github.com/[group]/eshop-sut/issues/[number]} \\
+        GitHub Issue & \url{https://github.com/dinosauce-285/Software-Testing-G02/issues/5} \\
         \bottomrule
     \end{tabularx}
 \end{table}
@@ -996,7 +996,7 @@ functional testing từ UI --- đã loại; phần khách vãng lai né giới h
         Tái hiện     & 1. Đặt tổng đơn $=300.000$. \newline 2. Nhập mã \texttt{VIP100} (min 300.000). \newline 3. Áp dụng. \\
         Expected     & Chấp nhận (đơn đủ mức tối thiểu), final 200.000. \\
         Actual       & Báo lỗi đỏ ``Đơn hàng chưa đủ giá trị tối thiểu\ldots'' dù đơn bằng đúng mức. \\
-        GitHub Issue & \url{https://github.com/[group]/eshop-sut/issues/[number]} \\
+        GitHub Issue & \url{https://github.com/dinosauce-285/Software-Testing-G02/issues/6} \\
         \bottomrule
     \end{tabularx}
 \end{table}
@@ -1016,7 +1016,7 @@ functional testing từ UI --- đã loại; phần khách vãng lai né giới h
         Tái hiện     & 1. \emph{Không} đăng nhập, vào Checkout. \newline 2. Nhập \texttt{VIP100} và bấm ``Áp dụng'' nhiều lần liên tiếp. \\
         Expected     & Bị chặn theo \texttt{max\_uses\_per\_user}. \\
         Actual       & Mã luôn áp dụng được cho khách, không lần nào bị chặn. \\
-        GitHub Issue & \url{https://github.com/[group]/eshop-sut/issues/[number]} \\
+        GitHub Issue & \url{https://github.com/dinosauce-285/Software-Testing-G02/issues/7} \\
         \bottomrule
     \end{tabularx}
 \end{table}
@@ -1036,7 +1036,7 @@ functional testing từ UI --- đã loại; phần khách vãng lai né giới h
         Tái hiện     & 1. Đăng nhập app admin, tab ``Mã Giảm Giá'', tạo mã fixed \texttt{discount=100.000, min=50.000}, còn hạn. \newline 2. Ra web, vào Checkout, đặt Tổng tiền \texttt{60.000} ($>$ min). \newline 3. Nhập mã vừa tạo, bấm ``Áp dụng''. \\
         Expected     & ``Thành tiền'' được kẹp $\ge 0$ và hợp lý. \\
         Actual       & ``Thành tiền'' hiển thị $-40.000$ ₫ (âm, không kẹp). \\
-        GitHub Issue & \url{https://github.com/[group]/eshop-sut/issues/[number]} \\
+        GitHub Issue & \url{https://github.com/dinosauce-285/Software-Testing-G02/issues/8} \\
         \bottomrule
     \end{tabularx}
 \end{table}
@@ -1357,7 +1357,7 @@ nhận bằng thực thi}, chụp màn hình và tạo GitHub Issue trước khi
         Tái hiện     & 1. Đăng nhập admin, mở tab ``Danh mục''. \newline 2. Để trống ô ``Tên danh mục mới'' (hoặc gõ \verb|"   "|), bấm ``Thêm mới''. \newline 3. Quan sát bảng danh mục. \\
         Expected     & Chặn và báo lỗi; không tạo danh mục tên rỗng. \\
         Actual       & Một hàng danh mục mới với ô Tên trống xuất hiện trong bảng. \\
-        GitHub Issue & \url{https://github.com/[group]/eshop-sut/issues/[number]} \\
+        GitHub Issue & \url{https://github.com/dinosauce-285/Software-Testing-G02/issues/9} \\
         \bottomrule
     \end{tabularx}
 \end{table}
@@ -1377,7 +1377,7 @@ nhận bằng thực thi}, chụp màn hình và tạo GitHub Issue trước khi
         Tái hiện     & 1. Đăng nhập admin, tab ``Danh mục''. \newline 2. Nhập ``Laptop'' (đã có sẵn) rồi bấm ``Thêm mới''. \newline 3. Quan sát bảng có hai hàng ``Laptop''. \\
         Expected     & Từ chối vì tên đã tồn tại. \\
         Actual       & Bảng hiển thị hai danh mục cùng tên ``Laptop''. \\
-        GitHub Issue & \url{https://github.com/[group]/eshop-sut/issues/[number]} \\
+        GitHub Issue & \url{https://github.com/dinosauce-285/Software-Testing-G02/issues/10} \\
         \bottomrule
     \end{tabularx}
 \end{table}
@@ -1397,7 +1397,7 @@ nhận bằng thực thi}, chụp màn hình và tạo GitHub Issue trước khi
         Tái hiện     & 1. Đăng nhập admin, tab ``Danh mục''. \newline 2. Bấm ``Xóa'' ở danh mục ``Điện thoại'' (đang có 2 sản phẩm). \newline 3. Sang tab ``Sản phẩm'' xem các sản phẩm thuộc danh mục vừa xóa. \\
         Expected     & Chặn/cảnh báo khi danh mục còn sản phẩm, hoặc di chuyển sản phẩm. \\
         Actual       & Danh mục biến mất ngay; các sản phẩm vẫn còn nhưng thuộc danh mục không còn tồn tại (mồ côi). \\
-        GitHub Issue & \url{https://github.com/[group]/eshop-sut/issues/[number]} \\
+        GitHub Issue & \url{https://github.com/dinosauce-285/Software-Testing-G02/issues/11} \\
         \bottomrule
     \end{tabularx}
 \end{table}
@@ -1417,7 +1417,7 @@ nhận bằng thực thi}, chụp màn hình và tạo GitHub Issue trước khi
         Tái hiện     & 1. Đăng nhập admin, tab ``Danh mục''. \newline 2. Dán chuỗi $\approx$5.000 ký tự vào ô ``Tên danh mục mới'', bấm ``Thêm mới''. \newline 3. Quan sát hàng mới trong bảng. \\
         Expected     & Giới hạn độ dài hợp lý / từ chối khi vượt. \\
         Actual       & Danh mục được tạo với toàn bộ chuỗi, hiển thị tràn trong bảng. \\
-        GitHub Issue & \url{https://github.com/[group]/eshop-sut/issues/[number]} \\
+        GitHub Issue & \url{https://github.com/dinosauce-285/Software-Testing-G02/issues/12} \\
         \bottomrule
     \end{tabularx}
 \end{table}
@@ -1728,7 +1728,7 @@ thi trên app}, chụp màn hình và tạo GitHub Issue trước khi nộp.
         Tái hiện     & 1. Thêm 1 sản phẩm vào giỏ. \newline 2. Mở giỏ, sửa ô số lượng thành \texttt{2}. \newline 3. Quan sát số lượng/thành tiền. \\
         Expected     & Số lượng = 2. \\
         Actual       & Ô số lượng nhảy thành 3, ``Thành tiền'' tính theo 3. \\
-        GitHub Issue & \url{https://github.com/[group]/eshop-sut/issues/[number]} \\
+        GitHub Issue & \url{https://github.com/dinosauce-285/Software-Testing-G02/issues/13} \\
         \bottomrule
     \end{tabularx}
 \end{table}
@@ -1748,7 +1748,7 @@ thi trên app}, chụp màn hình và tạo GitHub Issue trước khi nộp.
         Tái hiện     & 1. Thêm 3 sản phẩm khác nhau vào giỏ (màn giỏ hiện 3 món, tổng của 3). \newline 2. Bấm Thanh toán, rồi Xác nhận. \\
         Expected     & Đơn đặt gồm đủ 3 món, khớp số tiền đã thu. \\
         Actual       & App gửi chỉ 2 món (bỏ món cuối) nhưng vẫn thu tiền của cả 3; app không có màn chi tiết đơn nên sai lệch bị che khuất (vùng xám). \\
-        GitHub Issue & \url{https://github.com/[group]/eshop-sut/issues/[number]} \\
+        GitHub Issue & \url{https://github.com/dinosauce-285/Software-Testing-G02/issues/14} \\
         \bottomrule
     \end{tabularx}
 \end{table}
@@ -1768,7 +1768,7 @@ thi trên app}, chụp màn hình và tạo GitHub Issue trước khi nộp.
         Tái hiện     & 1. Trang chi tiết, nhập số lượng \texttt{0} (hoặc \texttt{-2}, \texttt{abc}, \texttt{2.9}). \newline 2. Thêm vào giỏ. \\
         Expected     & Báo lỗi/không cho thêm với số lượng không hợp lệ. \\
         Actual       & Giỏ âm thầm hiện số lượng 1 (hoặc phần nguyên), không cảnh báo. \\
-        GitHub Issue & \url{https://github.com/[group]/eshop-sut/issues/[number]} \\
+        GitHub Issue & \url{https://github.com/dinosauce-285/Software-Testing-G02/issues/15} \\
         \bottomrule
     \end{tabularx}
 \end{table}
@@ -1788,7 +1788,7 @@ thi trên app}, chụp màn hình và tạo GitHub Issue trước khi nộp.
         Tái hiện     & 1. Trang chi tiết, nhập số lượng \texttt{999999}. \newline 2. Thêm vào giỏ, xem tổng. \\
         Expected     & Giới hạn theo tồn kho / mức tối đa hợp lý. \\
         Actual       & Giỏ nhận toàn bộ, ``Thành tiền'' hiện số cực lớn phi lý. \\
-        GitHub Issue & \url{https://github.com/[group]/eshop-sut/issues/[number]} \\
+        GitHub Issue & \url{https://github.com/dinosauce-285/Software-Testing-G02/issues/16} \\
         \bottomrule
     \end{tabularx}
 \end{table}
