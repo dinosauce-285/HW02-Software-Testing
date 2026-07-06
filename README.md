@@ -54,8 +54,9 @@ dứt khoát theo đặc tả.
 
 **Toàn bộ 16/16 bug ứng viên đều quan sát được trực tiếp trên UI**; các lỗi chỉ chạm được từ API
 (backend không kiểm dữ liệu, mật khẩu plaintext, phân quyền admin ở tầng API, giả mạo `user_id`,
-PUT/DELETE id không tồn tại) đã được loại khỏi phạm vi functional-UI. Chi tiết từng bug: xem
-`reports/bug-report.md` và Chương Bug Reports trong báo cáo chính (`main.tex` / PDF).
+PUT/DELETE id không tồn tại) đã được loại khỏi phạm vi functional-UI. Chi tiết từng bug (bước
+tái hiện, kỳ vọng/thực tế, ảnh chụp, link GitHub Issue) nằm ở **báo cáo lỗi riêng**
+`reports/bug-report.md` (tách khỏi báo cáo chính theo mục 14 của đề).
 
 ### 2.3. Demo video (Agent Skill)
 
@@ -88,12 +89,16 @@ PUT/DELETE id không tồn tại) đã được loại khỏi phạm vi function
 ```
 HW02-Software-Testing/
 ├── README.md                     # File này (self-assessment + test summary)
-├── main.tex                      # Báo cáo chính (LaTeX) — Domain Testing + BVA + Bug + AI Critique + AI Audit
+├── main.tex                      # Báo cáo chính (LaTeX) — Domain Testing + BVA + AI Gap + Agent Skill
 ├── main.pdf                      # ⬜ TODO: biên dịch từ main.tex (xem mục 5)
 ├── reports/
-│   ├── bug-report.md             # 20 bug ở dạng Markdown, sẵn sàng dán lên GitHub Issues
-│   └── git-commit-log.txt        # Git commit log (đã xuất thực tế)
-├── figures/                      # ⬜ TODO: ảnh chụp bug (xem figures/README.md)
+│   ├── bug-report.md             # Báo cáo lỗi riêng — 16 bug (đã nhúng ảnh + link GitHub Issue)
+│   ├── ai-critique-and-audit.md  # AI Critique + AI Audit Report (riêng) — cần xuất PDF kèm
+│   └── git-commit-log.txt        # ⬜ Git commit log (để trống — tự điền bằng lệnh ở mục 6)
+├── AI_Audit_Report_Vn_filled.docx # Bản AI Audit theo template (Word)
+├── figures/
+│   ├── bugs/                     # 16 ảnh chụp bug: bug_a_01.png … bug_d_04.png
+│   ├── github-issues/            # Ảnh trang GitHub Issues (issue-01..16 + issues-list)
 │   └── README.md                 # Hướng dẫn đặt tên screenshot
 ├── HW02-Domain-Testing.md        # Đề bài
 ├── Homework-Policies.md          # Chính sách
@@ -120,13 +125,14 @@ Nếu lỗi font T5/tiếng Việt, thử `xelatex main.tex` (đổi `\usepackag
 
 ## 6. Việc còn lại phải làm thủ công (đã tạo sẵn boilerplate)
 
-- [ ] **Screenshot 20 bug** → đặt vào `figures/` theo tên `bug_a_01.png … bug_d_04.png`
-      (xem `figures/README.md`). Bỏ dấu `%` ở dòng `\includegraphics` tương ứng trong `main.tex`.
-- [ ] **Tạo 20 GitHub Issues** → dùng nội dung trong `reports/bug-report.md`; dán URL issue vào
-      ô *GitHub Issue* của từng bug trong `main.tex` (và cột link trong `bug-report.md`).
+- [x] **Screenshot 16 bug** → đã gom trong `figures/bugs/` (`bug_a_01.png … bug_d_04.png`) và
+      nhúng vào `reports/bug-report.md`.
+- [x] **Tạo 16 GitHub Issues** (#1–16) → URL đã điền trong `reports/bug-report.md`; ảnh trang
+      Issues lưu ở `figures/github-issues/`.
 - [ ] **Quay video demo** skill `domain-bva-test` → dán link YouTube vào README (mục 2.3) và
-      Chương 6 của `main.tex`.
-- [ ] **Biên dịch `main.pdf`** (mục 5).
-- [ ] **Xác nhận điểm tự đánh giá** (mục 3) và đặt tên file `.zip` theo quy định.
-- [ ] (Tùy chọn) Cập nhật lại `reports/git-commit-log.txt` nếu có thêm commit:
+      Chương Agent Skill của `main.tex`.
+- [ ] **Biên dịch `main.pdf`** (mục 5) — máy hiện chưa có LaTeX toolchain.
+- [ ] **Cập nhật `reports/git-commit-log.txt`** (log hiện đang cũ):
       `git log --pretty=format:"%h | %ad | %s" --date=format:"%Y-%m-%d %H:%M" > reports/git-commit-log.txt`
+- [ ] **`git push`** các commit mới lên remote nhóm.
+- [ ] **Xác nhận điểm tự đánh giá** (mục 3) và đặt tên file `.zip` theo quy định.
