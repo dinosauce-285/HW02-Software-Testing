@@ -6,8 +6,9 @@ description: Apply Domain Testing and Boundary Value Analysis to an EShop featur
 # Domain Testing + Boundary Value Analysis Skill
 
 Covers **Section 6 (Requirements)** of HW02: Domain Testing, Boundary Value
-Analysis, and AI gap analysis. Bug reporting is handled by the **Bug Reporter**
-procedure in `CLAUDE.md`.
+Analysis, and AI gap analysis. This skill only designs and reports the test cases;
+bug reporting and audit logging are separate skills the user invokes afterwards
+(`bug-reporter`, `ai-audit-logger`) — this skill does not call them.
 
 **Core principle (from the assignment):** do NOT issue one generic prompt like
 "generate test cases and find bugs". Walk through every step below explicitly and
@@ -102,5 +103,5 @@ final table). Use a standalone document (`\documentclass{article}`, `geometry`,
 ### Step 10 — Hand off
 - Execution: only fill "actual result / pass-fail" after the user runs the tests
   against EShop — never fabricate execution outcomes.
-- Any failure → file it with the **Bug Reporter** procedure in `CLAUDE.md`.
-- Log this session with the **AI Audit Logger** procedure in `CLAUDE.md`.
+- Stop here. Reporting failures and logging the session are done later by the **user**
+  invoking the `bug-reporter` and `ai-audit-logger` skills — this skill does not.
