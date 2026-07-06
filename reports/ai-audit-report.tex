@@ -1,0 +1,51 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T5]{fontenc}
+\usepackage[vietnamese,english]{babel}
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\title{AI Audit Report --- HW02 Domain Testing}
+\begin{document}
+\maketitle
+Declaration: I use AI tools for the following tasks.
+
+\section*{[1] Design Domain + BVA test cases for FR-09 (Coupon)}
+\begin{itemize}[leftmargin=*]
+  \item \textbf{AI tool:} Claude Code (Opus 4.8, 1M context)
+  \item \textbf{Date \& time:} 2026-07-06 23:03
+  \item \textbf{Prompt:} \begin{quote}do /domain-bva-test for fr-09 @README.md\end{quote}
+  \item \textbf{AI output (summary):} Read the FR-09 spec (5 conditions C1--C5, discount
+        formula) and the SUT implementation (\texttt{backend/server.js} apply-coupon,
+        \texttt{database.js} seed). Produced a 10-step LaTeX report
+        (\texttt{reports/test-cases-FR-09.tex}): variables, domain characterisation,
+        19 equivalence classes, 4 boundaries with on/off-point matrix, 3-value BVA,
+        22 test cases (13 Domain + 9 BVA), an AI gap analysis, and coverage summary.
+        Flagged three suspected spec deviations as hypotheses to confirm on execution
+        (C3 strict \texttt{>} off-by-one, wrong percent formula, C4/C5 not enforced).
+  \item \textbf{Human review:} Verified the class/boundary derivation against the actual
+        handler and seed data (\texttt{discount\_value}=10, \texttt{min\_order\_amount}=300000);
+        removed a stray \texttt{\textbackslash multirow} that would not compile; confirmed
+        the ``Actual result'' column was left blank (no fabricated execution outcomes).
+        Kept the rest as generated. Responsibility: student Lý Quốc Thạnh.
+\end{itemize}
+
+\section*{[2] File bug: strong password with special character rejected (FR-01)}
+\begin{itemize}[leftmargin=*]
+  \item \textbf{AI tool:} Claude Code (Opus 4.8, 1M context)
+  \item \textbf{Date \& time:} 2026-07-06 23:10
+  \item \textbf{Prompt:} \begin{quote}Mật khẩu mạnh (có ký tự đặc biệt) bị từ chối /bug-reporter\end{quote}
+  \item \textbf{AI output (summary):} Before filing, checked the existing report and found
+        this bug already recorded as BUG-A-01 with GitHub issue \#1. Did \emph{not} create a
+        duplicate GitHub issue; instead created \texttt{reports/bug-report.tex} from the
+        bug-reporter skeleton with the bug as BUG-001 (feature FR-01, Domain+BVA, Major),
+        repro steps, expected/actual, the existing screenshot
+        \texttt{figures/bugs/bug\_a\_01.png}, and a reference to issue \#1.
+  \item \textbf{Human review:} Confirmed the duplicate-avoidance decision (no second issue
+        opened for an already-filed bug) and that the LaTeX entry matches the existing
+        Markdown BUG-A-01. Noted that \texttt{bug-report.tex} now coexists with the
+        Vietnamese \texttt{bug-report.md} deliverable, pending a decision on which format
+        is canonical. Responsibility: student Lý Quốc Thạnh.
+\end{itemize}
+% APPEND-BELOW
+\end{document}
