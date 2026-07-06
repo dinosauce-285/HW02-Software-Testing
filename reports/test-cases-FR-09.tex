@@ -1,0 +1,392 @@
+% ============================================================
+%  HW02 - Domain Testing on EShop
+%  Test-Case Report for FR-09: Coupon (Ma Giam Gia)
+%  Technique: Domain Testing + Boundary Value Analysis
+% ============================================================
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[top=2.2cm,bottom=2.2cm,left=2.2cm,right=2.2cm]{geometry}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{ragged2e}
+\usepackage{enumitem}
+\usepackage[table]{xcolor}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, linkcolor=black, urlcolor=blue}
+
+% Convenient column types with fixed widths and top-justified text
+\newcolumntype{L}[1]{>{\RaggedRight\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\Centering\arraybackslash}p{#1}}
+
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\dong}{VND} % use "VND" instead of the ₫ glyph for pdflatex portability
+
+\title{\textbf{FR-09 Coupon --- Domain Testing \& Boundary Value Analysis}\\[2pt]
+\large HW02 Software Testing --- SUT: EShop}
+\author{Test-case report generated with disciplined AI-first workflow (human-reviewed)}
+\date{2026-07-06}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent This report applies \textbf{Domain Testing} (equivalence partitioning,
+on/off-point analysis) and \textbf{Boundary Value Analysis} to feature
+\textbf{FR-09 --- Coupon} of the EShop system. The feature is specified in the
+System Requirements Specification (\code{README.md}, \S4, FR-09): a coupon is
+applied at checkout only when all \textbf{five} conditions C1--C5 hold, with a
+percent/fixed discount formula. Each derivation step below is shown explicitly so
+the reasoning is reviewable. Expected results are stated against the
+\emph{specification}; the ``Actual result / Pass--Fail'' column is intentionally
+left blank and is filled only after the tests are executed against the running
+SUT (never fabricated).
+\end{abstract}
+
+% ============================================================
+\section{Feature under test}
+% ============================================================
+
+\textbf{FR-09 --- Coupon (Ma Giam Gia).} At the Checkout step the user may enter a
+coupon code. The system applies a discount only when \emph{all five} conditions
+below are satisfied (\code{README.md} FR-09):
+
+\begin{center}
+\begin{tabular}{@{}c L{3.2cm} L{9.5cm}@{}}
+\toprule
+\# & Condition & Meaning \\
+\midrule
+C1 & Code exists & Code present in DB \emph{and} \code{is\_active = 1} \\
+C2 & Not expired & Current date must be \emph{before} \code{expired\_at} \\
+C3 & Meets threshold & Order total $\ge$ \code{min\_order\_amount} (\emph{greater than or equal}) \\
+C4 & Logged in & User must present a valid JWT token \\
+C5 & Uses remaining & User's prior uses of this code $<$ \code{max\_uses\_per\_user} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent\textbf{Discount formula (spec).}
+\begin{itemize}[nosep]
+  \item \code{percent}: \(\text{discount\_amount} = \text{total} \times \text{discount\_value} / 100\)
+  \item \code{fixed}: \(\text{discount\_amount} = \text{discount\_value}\)
+  \item \(\text{final\_amount} = \text{total} - \text{discount\_amount}\)
+\end{itemize}
+
+\noindent\textbf{Sample coupons seeded in the SUT} (\code{backend/database.js}):
+
+\begin{center}
+\begin{tabular}{@{}l l r r l r@{}}
+\toprule
+Code & Type & Value & Min order & Expires & Uses/user \\
+\midrule
+\code{SAVE10}  & percent & 10\%        & 300{,}000 & 2099-12-31 & 1 \\
+\code{BIGBUY}  & fixed   & 50{,}000    & 500{,}000 & 2099-12-31 & 1 \\
+\code{VIP100}  & fixed   & 100{,}000   & 300{,}000 & 2099-12-31 & 2 \\
+\code{EXPIRED} & percent & 20\%        & 100{,}000 & 2020-01-01 & 1 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\paragraph{Reference endpoint.} \code{POST /api/apply-coupon} with body
+\code{\{ code, total\_amount, user\_id \}} (\code{backend/server.js}). Note the
+endpoint carries \emph{no} authentication middleware and takes \code{user\_id}
+from the request body --- relevant to C4/C5 below.
+
+% ============================================================
+\section{Step 1 --- Identify variables}
+% ============================================================
+
+\begin{center}
+\begin{longtable}{@{}L{3.3cm} L{2.6cm} C{1.7cm} L{6.5cm}@{}}
+\toprule
+\textbf{Variable} & \textbf{Type} & \textbf{I/O} & \textbf{Notes} \\
+\midrule
+\endhead
+\code{code}              & string             & Input  & Coupon code entered at checkout \\
+\code{total\_amount}     & integer (\dong)    & Input  & Order total; client-supplied to the endpoint \\
+\code{user\_id}          & integer / token    & Input  & Identity \& login state (C4); read from body \\
+current date/time        & datetime           & Input  & Implicit; compared to \code{expired\_at} (C2) \\
+\code{is\_active}        & integer (0/1)      & Input* & Coupon record flag (C1) \\
+\code{expired\_at}       & date               & Input* & Coupon record; expiry boundary (C2) \\
+\code{min\_order\_amount}& integer (\dong)    & Input* & Coupon record; threshold boundary (C3) \\
+\code{max\_uses\_per\_user}& integer          & Input* & Coupon record; usage cap (C5) \\
+\code{usage\_count}      & integer            & Input* & User's prior uses of this code (C5) \\
+\code{type}              & enum \{percent,fixed\} & Input* & Selects discount formula \\
+\code{discount\_value}   & integer            & Input* & 10 = ``10\%'' for percent; \dong{} for fixed \\
+\midrule
+\code{success}           & boolean            & Output & Whether coupon was applied \\
+\code{discount\_amount}  & integer (\dong)    & Output & Computed discount \\
+\code{final\_amount}     & integer (\dong)    & Output & \code{total\_amount} $-$ \code{discount\_amount} \\
+\code{coupon\_id}        & integer            & Output & Applied coupon id \\
+error message / HTTP status & string / int    & Output & Rejection reason (400/404) \\
+\bottomrule
+\end{longtable}
+\end{center}
+\noindent\footnotesize (*) Coupon-record fields are not typed directly by the user but
+parameterise the decision; they are configured via FR-17 (Coupon CRUD).\normalsize
+
+% ============================================================
+\section{Step 2 --- Characterise each variable's domain}
+% ============================================================
+
+\begin{itemize}[leftmargin=1.3em]
+  \item \code{code}: non-empty string. \textbf{Valid domain} = the set of codes that
+        exist in DB with \code{is\_active = 1} (\code{SAVE10}, \code{BIGBUY},
+        \code{VIP100}; \code{EXPIRED} exists but fails C2). Required; rejected if empty.
+        Backend matches with an exact, case-sensitive SQL equality.
+  \item \code{total\_amount}: positive integer in \dong. Valid relative to a coupon
+        requires \code{total\_amount} $\ge$ \code{min\_order\_amount} (C3, inclusive per spec).
+        Ordered variable $\Rightarrow$ boundary at \code{min\_order\_amount}.
+  \item \code{user\_id} / login: two-state --- authenticated vs. not. Spec (C4) requires
+        authenticated. Also indexes \code{usage\_count} for C5.
+  \item current date vs \code{expired\_at}: ordered (time). Valid iff now $<$
+        \code{expired\_at} (C2, strict ``before''). Boundary at \code{expired\_at}.
+  \item \code{usage\_count}: integer $\ge 0$. Valid iff \code{usage\_count} $<$
+        \code{max\_uses\_per\_user} (C5). Boundary at \code{max\_uses\_per\_user}.
+  \item \code{is\_active}: valid domain for applying = \{1\}; \{0\} $\Rightarrow$ rejected (as C1).
+  \item \code{type}: allowed set \{\code{percent}, \code{fixed}\}; selects the output formula.
+\end{itemize}
+
+% ============================================================
+\section{Step 3 --- Equivalence partitioning (Domain Testing)}
+% ============================================================
+
+\begin{center}
+\begin{longtable}{@{}C{1.3cm} L{2.6cm} C{1.5cm} L{5.3cm} L{3.0cm}@{}}
+\toprule
+\textbf{Class} & \textbf{Variable} & \textbf{V/I} & \textbf{Description} & \textbf{Representative} \\
+\midrule
+\endhead
+EC-1  & \code{code}         & Valid   & Existing active code                     & \code{SAVE10} \\
+EC-2  & \code{code}         & Invalid & Non-existent code                        & \code{NOPE99} \\
+EC-3  & \code{code}         & Invalid & Empty / missing code                     & \code{""} \\
+EC-4  & \code{code}         & Invalid & Existing but \code{is\_active = 0}       & inactive code \\
+EC-5  & \code{code}         & Invalid & Wrong case / surrounding spaces          & \code{save10}, \code{" SAVE10 "} \\
+EC-6  & \code{code}         & Invalid & Injection-like string                    & \code{SAVE10' OR '1'='1} \\
+EC-7  & \code{total\_amount}& Valid   & total $\ge$ \code{min\_order\_amount}    & 300{,}000 (SAVE10) \\
+EC-8  & \code{total\_amount}& Invalid & total $<$ \code{min\_order\_amount}      & 299{,}999 \\
+EC-9  & \code{total\_amount}& Invalid & Missing / undefined total                & (field omitted) \\
+EC-10 & \code{total\_amount}& Invalid & Negative total                           & $-1$ \\
+EC-11 & \code{total\_amount}& Invalid & Non-numeric total                        & \code{"abc"} \\
+EC-12 & date/expiry         & Valid   & now $<$ \code{expired\_at}               & \code{SAVE10} (2099) \\
+EC-13 & date/expiry         & Invalid & now $\ge$ \code{expired\_at}             & \code{EXPIRED} (2020) \\
+EC-14 & login/\code{user\_id}& Valid  & Authenticated user, uses remaining       & valid token \\
+EC-15 & login/\code{user\_id}& Invalid& Not logged in (no token)                 & (no \code{user\_id}) \\
+EC-16 & \code{usage\_count} & Valid   & \code{usage\_count} $<$ max              & 0 or 1 (VIP100) \\
+EC-17 & \code{usage\_count} & Invalid & \code{usage\_count} $\ge$ max            & 1 (SAVE10, max 1) \\
+EC-18 & \code{type}         & Valid   & \code{percent} discount applied          & \code{SAVE10} \\
+EC-19 & \code{type}         & Valid   & \code{fixed} discount applied            & \code{BIGBUY} \\
+\bottomrule
+\end{longtable}
+\end{center}
+
+% ============================================================
+\section{Step 4 --- Identify boundaries}
+% ============================================================
+
+\begin{enumerate}[leftmargin=1.4em]
+  \item \textbf{Order-threshold boundary (C3)} at \code{min\_order\_amount}
+        (e.g.\ 300{,}000 for \code{SAVE10}). Spec: boundary is \textbf{inclusive}
+        (total $\ge$ min $\Rightarrow$ valid). \emph{Prime off-by-one candidate.}
+  \item \textbf{Expiry boundary (C2)} at \code{expired\_at}. Spec: valid iff now is
+        \textbf{strictly before} \code{expired\_at} (boundary exclusive on the valid side).
+  \item \textbf{Usage boundary (C5)} at \code{max\_uses\_per\_user} (e.g.\ 2 for
+        \code{VIP100}). Valid iff \code{usage\_count} $\le$ max$-1$; the value
+        \code{usage\_count} $=$ max is the first rejected point.
+  \item \textbf{Output boundary --- \code{final\_amount}} at 0: the discount should
+        never drive \code{final\_amount} below 0 (a fixed discount larger than the
+        remaining total). Worth checking for clamping.
+\end{enumerate}
+
+% ============================================================
+\section{Step 5 --- Domain matrix (on-point / off-point)}
+% ============================================================
+
+Using \code{SAVE10} (\code{min\_order\_amount} $=$ 300{,}000) for the threshold and
+\code{VIP100} (\code{max\_uses\_per\_user} $=$ 2) for usage.
+
+\begin{center}
+\begin{longtable}{@{}L{4.2cm} C{2.0cm} C{2.0cm} C{2.6cm} C{2.6cm}@{}}
+\toprule
+\textbf{Boundary} & \textbf{on-point} & \textbf{off-point} & \textbf{Expected on} & \textbf{Expected off} \\
+\midrule
+\endhead
+C3 threshold ($\ge$ 300{,}000) & 300{,}000 & 299{,}999 & Accept (apply) & Reject (below min) \\
+\quad in-point / out-point     & 500{,}000 & 100{,}000 & Accept & Reject \\
+\midrule
+C5 usage ($<$ 2)               & 2 (uses) & 1 (uses) & Reject (limit hit) & Accept (2nd use ok) \\
+\midrule
+C2 expiry (now $<$ exp)        & now $=$ \code{expired\_at} & now $=$ exp$-1$s & Reject (not before) & Accept \\
+\midrule
+Output \code{final\_amount}    & 0 & $-1$ & Allowed (=0) & Must not occur ($<$0) \\
+\bottomrule
+\end{longtable}
+\end{center}
+
+\noindent\textbf{Confirm the pass side.} For C3 the closed (valid) side is
+\emph{on and above} the boundary: at the on-point 300{,}000 the coupon must be
+\emph{accepted}. This is the classic off-by-one trap --- a \code{>} instead of
+\code{>=} check would wrongly reject exactly 300{,}000. For C5 the valid side is
+\emph{below} the cap: \code{usage\_count} $=$ 1 is the last accepted use for
+\code{VIP100} and \code{usage\_count} $=$ 2 is the first rejected.
+
+% ============================================================
+\section{Step 6 --- Boundary Value Analysis (3-value)}
+% ============================================================
+
+\begin{center}
+\begin{longtable}{@{}L{4.0cm} C{2.3cm} C{2.6cm} L{5.2cm}@{}}
+\toprule
+\textbf{Boundary} & \textbf{Test value} & \textbf{Position} & \textbf{Expected (spec)} \\
+\midrule
+\endhead
+C3 min 300{,}000 (SAVE10) & 299{,}999 & min$-1$ & Reject: below minimum \\
+                          & 300{,}000 & min     & \textbf{Accept}: threshold is inclusive \\
+                          & 300{,}001 & min$+1$ & Accept: above minimum \\
+\midrule
+C5 max 2 uses (VIP100)    & 1 use     & max$-1$ & Accept: 2nd use allowed \\
+                          & 2 uses    & max     & Reject: limit reached \\
+                          & 3 uses    & max$+1$ & Reject: limit exceeded \\
+\midrule
+C5 max 1 use (SAVE10)     & 0 uses    & max$-1$ & Accept: 1st use \\
+                          & 1 use     & max     & Reject: already used once \\
+\midrule
+C2 expiry (SAVE10 2099)   & day before & exp$-1$ & Accept: still valid \\
+                          & expiry day & exp     & Reject: not strictly before \\
+                          & day after  & exp$+1$ & Reject: expired \\
+\bottomrule
+\end{longtable}
+\end{center}
+\noindent\footnotesize (\code{\textbackslash multirow} not used to keep the file
+dependency-free; grouping shown by blank leading cells.)\normalsize
+
+% ============================================================
+\section{Step 7 --- Test cases}
+% ============================================================
+
+Single-fault assumption: each case varies \emph{one} variable off its valid class
+while the others stay valid, plus a few multi-variable interaction cases at the end.
+\textbf{Precondition (common):} the four seeded coupons exist; unless noted, the
+user is logged in with a valid token and has \code{usage\_count} $=$ 0 for the code.
+The ``Actual / Pass--Fail'' column is filled only after execution.
+
+\begin{center}
+\begin{longtable}{@{}C{1.15cm} C{1.15cm} L{4.7cm} L{4.6cm} L{2.9cm}@{}}
+\toprule
+\textbf{TC} & \textbf{Tech.} & \textbf{Input(s)} & \textbf{Expected result (spec)} & \textbf{Covers} \\
+\midrule
+\endhead
+TC-01 & Domain & \code{SAVE10}, total 500{,}000, logged in & Accept; discount 50{,}000; final 450{,}000 & EC-1,7,12,14,18 \\
+TC-02 & Domain & \code{BIGBUY}, total 600{,}000, logged in & Accept; discount 50{,}000; final 550{,}000 & EC-19 (fixed) \\
+TC-03 & Domain & \code{NOPE99}, total 500{,}000 & Reject 404 ``khong ton tai'' & EC-2 \\
+TC-04 & Domain & empty code, total 500{,}000 & Reject 400 ``Vui long nhap ma'' & EC-3 \\
+TC-05 & Domain & inactive code, total 500{,}000 & Reject 404 (treated as non-existent) & EC-4 \\
+TC-06 & Domain & \code{save10} (lower-case), total 500{,}000 & Reject (code not matched) & EC-5 \\
+TC-07 & Domain & \code{" SAVE10 "} (spaces), total 500{,}000 & Reject / trimmed-and-matched, but never a crash & EC-5 \\
+TC-08 & Domain & \code{SAVE10' OR '1'='1}, total 500{,}000 & Reject 404; no SQL error (parameterised) & EC-6 \\
+TC-09 & BVA    & \code{SAVE10}, total \textbf{299{,}999} & Reject: below minimum & EC-8, C3 min$-1$ \\
+TC-10 & BVA    & \code{SAVE10}, total \textbf{300{,}000} & \textbf{Accept} (inclusive); discount 30{,}000; final 270{,}000 & C3 min (on-point) \\
+TC-11 & BVA    & \code{SAVE10}, total \textbf{300{,}001} & Accept; discount 30{,}000 (floor); final 270{,}001 & C3 min$+1$ \\
+TC-12 & Domain & \code{SAVE10}, total omitted & Reject (invalid/missing total), no NaN success & EC-9 \\
+TC-13 & Domain & \code{SAVE10}, total \textbf{$-1$} & Reject: below minimum / invalid & EC-10 \\
+TC-14 & Domain & \code{SAVE10}, total \code{"abc"} & Reject: non-numeric, no crash & EC-11 \\
+TC-15 & Domain & \code{EXPIRED}, total 200{,}000 & Reject 400 ``da het han'' & EC-13, C2 \\
+TC-16 & Domain & \code{SAVE10}, \textbf{not logged in} (no \code{user\_id}) & Reject: C4 not satisfied (must be authenticated) & EC-15, C4 \\
+TC-17 & BVA    & \code{SAVE10}, \code{usage\_count}=1 (already used once) & Reject: usage limit reached (max 1) & EC-17, C5 max \\
+TC-18 & BVA    & \code{VIP100}, \code{usage\_count}=1 & Accept: 2nd use allowed & C5 max$-1$ \\
+TC-19 & BVA    & \code{VIP100}, \code{usage\_count}=2 & Reject: limit reached & C5 max \\
+TC-20 & Domain & \code{SAVE10} percent formula, total 300{,}000 & discount 30{,}000; final 270{,}000 (spec formula) & EC-18, output \\
+TC-21 & Domain & \code{EXPIRED}, total 50{,}000 (below min \emph{and} expired) & Reject with a correct, unambiguous reason & C2$\times$C3 interaction \\
+TC-22 & Domain & fixed coupon whose \code{discount\_value} $>$ total (setup) & \code{final\_amount} must not go below 0 & Output boundary \\
+\bottomrule
+\end{longtable}
+\end{center}
+
+% ============================================================
+\section{Step 8 --- AI gap analysis (Section 6.3)}
+% ============================================================
+
+After producing Steps 1--7, the cases were critically re-reviewed against the
+\emph{implementation} (\code{backend/server.js}) to hunt for misses --- especially
+\textbf{output} boundaries, multi-variable interactions, and business-rule edges.
+The following gaps were found and added; the ``Why missed'' column classifies each
+as \emph{prompt quality}, \emph{AI tool limitation}, or \emph{inherent feature
+complexity}.
+
+\begin{center}
+\begin{longtable}{@{}L{6.3cm} L{4.6cm} C{2.4cm}@{}}
+\toprule
+\textbf{Missed case} & \textbf{Why missed} & \textbf{Added as} \\
+\midrule
+\endhead
+Percent \emph{output} value, not just accept/reject --- the spec formula
+$total\times value/100$ must be checked numerically (SUT computes something else). &
+Inherent complexity: output correctness is easy to overlook when focusing on the
+5 accept/reject conditions. & TC-20 \\
+C4 tested as a real \emph{authentication} requirement (endpoint has no token check;
+\code{user\_id} comes from the body). & AI tool limitation: spec-only reading
+misses that the endpoint is unauthenticated. & TC-16 \\
+C5 bypass when \code{user\_id} is omitted --- the usage check is skipped entirely,
+so an anonymous request applies the coupon with no cap. & Inherent complexity:
+requires reading the branch structure, not the spec. & TC-16, TC-12 \\
+Threshold \emph{on-point} 300{,}000 explicitly (\code{>} vs \code{>=}). & Prompt
+quality: a generic ``test the minimum'' prompt would test only 299{,}999/300{,}001. & TC-10 \\
+Multi-condition interaction: expired \emph{and} below-threshold --- which reason
+does the user see, and is it the correct one? & Inherent complexity: interaction
+between C2 and C3 and message priority. & TC-21 \\
+Output boundary \code{final\_amount} $<$ 0 for an over-large fixed discount. &
+Inherent complexity: output boundaries are commonly forgotten. & TC-22 \\
+Non-numeric / missing \code{total\_amount} (type robustness at the API boundary). &
+Prompt quality: format/type classes are often dropped for numeric fields. & TC-12, TC-14 \\
+Case-sensitivity / whitespace on \code{code} (backend exact match vs.\ UI upper-casing). &
+AI tool limitation: cross-layer behaviour (UI normalises, API does not). & TC-06, TC-07 \\
+\bottomrule
+\end{longtable}
+\end{center}
+
+\paragraph{Suspected spec deviations to verify on execution (hypotheses, not results).}
+Reading the implementation suggests the following likely failures --- to be
+\emph{confirmed} by running TC-10, TC-16, TC-20 (and reported separately via the
+bug-reporter skill, not here):
+\begin{enumerate}[leftmargin=1.4em,nosep]
+  \item \textbf{C3 off-by-one}: the handler uses \code{total\_amount > min\_order\_amount}
+        (strict), so the on-point 300{,}000 is expected to be \emph{wrongly rejected}
+        (TC-10). Spec requires $\ge$.
+  \item \textbf{Percent formula}: the handler computes
+        \code{floor(total\_amount * (1 - discount\_value))} instead of
+        $total\times value/100$; with \code{discount\_value}$=10$ this yields an
+        absurd (negative/inflated) result (TC-20).
+  \item \textbf{C4 not enforced}: no auth middleware; omitting \code{user\_id} both
+        bypasses login (C4) and skips the usage cap (C5) (TC-16).
+\end{enumerate}
+
+% ============================================================
+\section{Step 9 --- Coverage summary}
+% ============================================================
+
+\begin{itemize}[nosep]
+  \item \textbf{Conditions:} C1 (TC-03,04,05,08), C2 (TC-15,21), C3 (TC-09,10,11,21),
+        C4 (TC-16), C5 (TC-17,18,19).
+  \item \textbf{Equivalence classes:} EC-1..EC-19 all represented by $\ge 1$ case.
+  \item \textbf{Boundaries:} C3 threshold (3-value), C5 usage (3-value on VIP100,
+        2-value on SAVE10), C2 expiry, and the \code{final\_amount} output boundary.
+  \item \textbf{Techniques:} Domain (13 cases) + BVA (9 cases) = 22 test cases.
+\end{itemize}
+
+% ============================================================
+\section{Step 10 --- Hand-off}
+% ============================================================
+
+\begin{itemize}[nosep]
+  \item Execute TC-01..TC-22 against the running SUT (\code{POST /api/apply-coupon}
+        and/or the Checkout UI) and fill the ``Actual result / Pass--Fail'' column.
+        Do \textbf{not} fabricate outcomes.
+  \item Any case that fails against the spec is filed via the \textbf{bug-reporter}
+        skill (bug report + GitHub Issue + screenshot); this AI session is logged via
+        the \textbf{ai-audit-logger} skill. Those steps are performed separately by
+        the student and are out of scope for this report.
+\end{itemize}
+
+\end{document}
