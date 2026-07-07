@@ -249,16 +249,6 @@ mà chương này nhắm tới. Hệ quả: mật khẩu mạnh như \texttt{Pas
 mật khẩu yếu như \texttt{Passw0rd 1} lại được chấp nhận.
 \end{notebox}
 
-\begin{notebox}
-\textbf{Phạm vi \& quy ước cột kết quả.} Theo giảng viên (forum Q\&A HW02): functional
-testing thực hiện từ UI Frontend. Mọi ca dưới đây thao tác trên biểu mẫu Đăng ký của
-web (\texttt{frontend-web}, trang \texttt{/register}); cột Kết quả/Trạng thái là
-hành vi quan sát trên giao diện (thông báo lỗi, điều hướng \texttt{/login}, và đối
-chiếu bản ghi qua tab Người dùng của app admin). Chế độ ``sinh viên tự chạy, AI dự đoán từ mã
-nguồn''. Cột Expected là hành vi đúng theo đặc tả; ca có Kết quả khác Expected là
-lỗi.
-\end{notebox}
-
 \section{Domain Testing}
 
 Domain Testing được áp dụng theo trình tự: (1) xác định biến $\to$
@@ -593,16 +583,6 @@ nhưng công thức lại là \texttt{total\_amount $\times$ (1 $-$ discount\_va
 \texttt{fixed}.
 \end{notebox}
 
-\begin{notebox}
-\textbf{Phạm vi \& quy ước cột kết quả.} Theo giảng viên (forum Q\&A HW02): functional testing
-từ UI Frontend. Mọi ca thao tác trên \textbf{trang Checkout của web} (thêm sản phẩm vào
-giỏ, chỉnh ô Tổng tiền, nhập mã, bấm ``Áp dụng''); ô Tổng tiền cho phép nhập trực tiếp nên kiểm
-được biên \texttt{min\_order\_amount} ngay trên giao diện. Ca cần một mã đặc biệt (vd mã fixed
-lớn hơn đơn) được tạo trước ở tab ``Mã Giảm Giá'' của app admin rồi áp trên Checkout.
-Cột Kết quả/Trạng thái là con số/thông báo hiển thị trên màn hình; chế độ
-``sinh viên tự chạy, AI dự đoán''.
-\end{notebox}
-
 \section{Domain Testing}
 
 Áp dụng Domain Testing theo bốn bước (xác định biến $\to$ phân hoạch miền
@@ -870,18 +850,6 @@ Tính năng FR-14 — Quản lý danh mục (CRUD) thuộc trang Web Admin, cho 
 thêm/sửa/xóa danh mục sản phẩm. Toàn bộ logic nằm ở 4 endpoint trong
 \texttt{backend/server.js}; bảng \texttt{categories} khai báo ở \texttt{backend/database.js}.
 
-\begin{notebox}
-\textbf{Phạm vi kiểm thử — kiểm từ UI trang Admin.} Theo giảng viên Hồ Tuấn Thanh (diễn đàn
-Q\&A HW02, Moodle 01/07/2026): ``Mình thực hiện functional testing thì test từ UI
-Frontend nhé''. FR-14 được thao tác qua ứng dụng admin riêng \texttt{frontend-admin}
-(React/Vite), tab ``Danh mục'' (\texttt{frontend-admin/src/App.jsx}). Đăng nhập bằng
-tài khoản admin có sẵn (\texttt{admin@eshop.com} / \texttt{Admin123!}); form login chặn tài
-khoản không phải admin (``Bạn không phải là admin!''). Giao diện danh mục chỉ
-cung cấp hai thao tác: Thêm mới (\texttt{Thêm mới}) và Xóa (\texttt{Xóa}) --- không có nút Sửa.
-Vì vậy mọi kỳ vọng và cột Kết quả dưới đây là những gì quan sát được trên UI (bảng danh
-mục, thông báo, hệ quả ở tab Sản phẩm), không phải gọi API trực tiếp.
-\end{notebox}
-
 \noindent Về mặt cài đặt, tab Danh mục gọi tới 4 endpoint sau (UI chỉ dùng POST tạo và DELETE
 xóa; GET để nạp bảng); liệt kê để đối chiếu hành vi quan sát được:
 \begin{itemize}
@@ -912,14 +880,6 @@ danh mục (chức năng admin) mở cho mọi tài khoản đăng nhập; (2) k
 \texttt{name} (rỗng/trùng/quá dài); (3) PUT/DELETE trên \texttt{id} không tồn tại vẫn
 trả \texttt{200} thành công (không kiểm \texttt{this.changes}); (4) xóa danh mục làm
 mồ côi sản phẩm (không khóa ngoại/cascade).
-\end{notebox}
-
-\begin{notebox}
-\textbf{Quy ước cột kết quả} (như Feature A/B): mọi thao tác thực hiện trên giao diện app
-admin (\texttt{frontend-admin}, tab ``Danh mục''); cột Kết quả/Trạng thái là hành
-vi \textbf{quan sát được trên UI} --- bảng danh mục, thông báo (\texttt{alert}), và hệ quả nhìn
-thấy ở tab ``Sản phẩm''. Chế độ ``sinh viên tự chạy, AI dự đoán từ mã nguồn''; sinh viên đăng
-nhập \texttt{admin@eshop.com}/\texttt{Admin123!}, mở tab Danh mục và đối chiếu.
 \end{notebox}
 
 \section{Domain Testing}
@@ -1203,14 +1163,6 @@ tiền món không được ghi nhận. Ngoài ra (A) âm thầm ép mọi số 
 (0/âm/chữ/thập phân) về 1.
 \end{notebox}
 
-\begin{notebox}
-\textbf{Phạm vi \& quy ước cột kết quả.} Với app mobile, giao diện chính là ứng dụng ---
-mọi ca được \textbf{thao tác trực tiếp trên app Expo} (màn hình sản phẩm, giỏ hàng, thanh toán);
-cột Kết quả/Trạng thái là hành vi \textbf{quan sát trên màn hình} (số lượng trong
-giỏ, dòng ``Thành tiền'', thông báo). Giỏ hàng là trạng thái phía client (chưa gọi API
-cho tới khi Xác nhận thanh toán). Chế độ ``sinh viên tự chạy, AI dự đoán từ mã \texttt{App.js}''.
-\end{notebox}
-
 \section{Domain Testing}
 
 Áp dụng Domain Testing theo bốn bước (xác định biến $\to$ phân hoạch miền
@@ -1444,80 +1396,6 @@ Domain Testing.
         \bottomrule
     \end{tabularx}
 \end{table}
-
-% ============================================================
-%  CHƯƠNG 6: AGENT SKILL
-% ============================================================
-\chapter{Agent Skill}
-
-\section{Mô Tả Skill}
-Em xây dựng một Agent Skill tên \texttt{domain-bva-test} (đặt tại
-\texttt{.claude/skills/domain-bva-test/SKILL.md}) chạy trong Claude Code. Skill hiện thực hóa
-đúng Mục 6 của đề bài: dẫn AI đi qua từng bước của Domain Testing và Boundary
-Value Analysis thay vì một prompt chung chung ``sinh test case và tìm bug''.
-
-\subsection{Nguyên tắc cốt lõi}
-\begin{itemize}
-    \item \textbf{Disciplined AI-First:} skill ép AI thực hiện tuần tự 10 bước, mỗi bước là một
-    hạng mục kỹ thuật có thể review được (không nhảy thẳng tới bảng kết quả).
-    \item \textbf{Human review:} sau mỗi bước, sinh viên đối chiếu với mã nguồn/đặc tả; skill
-    cấm bịa giá trị đầu vào, Expected hay kết quả thực thi.
-    \item \textbf{Truy vết nguồn:} mọi Expected phải bắt nguồn từ đặc tả; mọi ``Actual'' phải
-    từ thực thi thật trên giao diện (web/app), không đoán mò.
-\end{itemize}
-
-\subsection{Mười bước của skill}
-\begin{enumerate}
-    \item \textbf{Identify variables} --- liệt kê mọi biến vào/ra, kể cả biến ẩn (độ dài, số
-    món, ngày, cờ boolean).
-    \item \textbf{Characterise domain} --- xác định miền hợp lệ + ràng buộc từng biến.
-    \item \textbf{Equivalence partitioning} --- chia lớp valid/invalid, mỗi lớp một mã EC.
-    \item \textbf{Identify boundaries} --- đánh dấu biên cho biến có thứ tự/độ dài.
-    \item \textbf{Domain matrix} --- phân tích ON/OFF/IN/OUT cho mỗi biên.
-    \item \textbf{3-value BVA} --- \texttt{min$-$1, min, min$+$1} và \texttt{max$-$1, max, max$+$1}.
-    \item \textbf{Design test cases} --- kết hợp phân hoạch + biên, giả định đơn lỗi + vài ca
-    tương tác đa biến.
-    \item \textbf{AI gap analysis} --- soi lại ca AI bỏ sót; ghi lý do (prompt/tool/
-    độ phức tạp).
-    \item \textbf{Emit report} --- xuất báo cáo có mục cho từng bước (thể hiện suy luận, không
-    chỉ bảng cuối).
-    \item \textbf{Hand off} --- chỉ điền Actual/pass-fail sau khi thực thi; việc báo lỗi và ghi
-    AI Audit do người dùng tự gọi các skill \texttt{bug-reporter} / \texttt{ai-audit-logger}
-    (các skill không gọi lẫn nhau).
-\end{enumerate}
-
-\section{Cách Sử Dụng}
-Gọi skill trong Claude Code bằng cú pháp slash-command, truyền feature cần kiểm thử:
-\begin{lstlisting}[language=bash, caption={Kích hoạt skill trong Claude Code}]
-# Trong phiên Claude Code tại thư mục repo:
-/domain-bva-test Áp dụng Domain Testing + BVA cho FR-09 (Mã giảm giá),
-đọc backend/server.js và database.js, điền trực tiếp vào main.tex (tiếng Việt),
-chế độ "sinh viên tự chạy, AI dự đoán rồi xác nhận bằng thực thi".
-\end{lstlisting}
-
-\noindent Metadata của skill (\texttt{SKILL.md}) khai báo điều kiện kích hoạt tự động:
-\begin{lstlisting}[caption={Frontmatter của SKILL.md},numbers=none]
----
-name: domain-bva-test
-description: Apply Domain Testing and Boundary Value Analysis to an
-  EShop feature (FR-XX), guiding the AI through every step of the
-  technique and producing a reviewable test-case report plus an AI
-  gap analysis. Use when the user wants to design test cases for a
-  feature, run domain testing / boundary value analysis, or complete
-  Section 6 of HW02.
----
-\end{lstlisting}
-
-\noindent Skill này đã được dùng để tạo toàn bộ 4 chương Feature A/B/C/D trong báo cáo này
-(xem báo cáo AI Audit riêng \texttt{reports/ai-critique-and-audit.md}, Interaction 1--4).
-
-\section{Video Demo}
-\begin{itemize}
-    \item \textbf{Video 1:} \url{https://youtube.com/...} --- Demo skill \texttt{domain-bva-test}
-    end-to-end trên Feature B (FR-09 Mã giảm giá): từ đọc mã nguồn $\to$ phân hoạch miền $\to$
-    BVA $\to$ gap analysis $\to$ thực thi API xác nhận bug công thức percent. (Cần quay
-    và dán link trước khi nộp.)
-\end{itemize}
 
 % ============================================================
 %  TÀI LIỆU THAM KHẢO

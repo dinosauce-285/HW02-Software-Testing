@@ -62,7 +62,7 @@ tái hiện, kỳ vọng/thực tế, ảnh chụp, link GitHub Issue) nằm ở
 
 | Video | Nội dung | Link |
 |-------|----------|------|
-| Video 1 | Demo skill `domain-bva-test` end-to-end trên Feature B (FR-09) | ⬜ *TODO: quay & dán link YouTube* |
+| Video 1 | Demo skill `domain-bva-test` end-to-end trên Feature B (FR-09) | https://www.youtube.com/watch?v=Q0roRLyvQ9o |
 
 ---
 
@@ -89,7 +89,7 @@ tái hiện, kỳ vọng/thực tế, ảnh chụp, link GitHub Issue) nằm ở
 ```
 HW02-Software-Testing/
 ├── README.md                     # File này (self-assessment + test summary)
-├── main.tex                      # Báo cáo chính (LaTeX) — Domain Testing + BVA + AI Gap + Agent Skill
+├── main.tex                      # Báo cáo chính (LaTeX) — Domain Testing + BVA + AI Gap
 ├── main.pdf                      # ⬜ TODO: biên dịch từ main.tex (xem mục 5)
 ├── reports/
 │   ├── bug-report.md             # Báo cáo lỗi riêng — 16 bug (đã nhúng ảnh + link GitHub Issue)
@@ -129,8 +129,7 @@ Nếu lỗi font T5/tiếng Việt, thử `xelatex main.tex` (đổi `\usepackag
       nhúng vào `reports/bug-report.md`.
 - [x] **Tạo 16 GitHub Issues** (#1–16) → URL đã điền trong `reports/bug-report.md`; ảnh trang
       Issues lưu ở `figures/github-issues/`.
-- [ ] **Quay video demo** skill `domain-bva-test` → dán link YouTube vào README (mục 2.3) và
-      Chương Agent Skill của `main.tex`.
+- [x] **Quay video demo** skill `domain-bva-test` → link YouTube đã dán ở README mục 2.3.
 - [ ] **Biên dịch `main.pdf`** (mục 5) — máy hiện chưa có LaTeX toolchain.
 - [ ] **Cập nhật `reports/git-commit-log.txt`** (log hiện đang cũ):
       `git log --pretty=format:"%h | %ad | %s" --date=format:"%Y-%m-%d %H:%M" > reports/git-commit-log.txt`
