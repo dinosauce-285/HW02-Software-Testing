@@ -1,5 +1,530 @@
-# Git commit log — HW02 Domain Testing
-# Để trống — tự điền bằng lệnh (chạy tại thư mục repo, sau khi đã commit hết các bước):
-#   git log --pretty=format:"%h | %ad | %s" --date=format:"%Y-%m-%d %H:%M" > reports/git-commit-log.txt
-#
-# (Xóa các dòng ghi chú này sau khi dán log thật vào.)
+* commit 44b37e384ca853cce2fbac2e9d66e181b63750ec
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Tue Jul 7 08:25:30 2026 +0700
+| 
+|     docs(report): drop UI-scope notes and Agent Skill chapter, add demo video link
+| 
+|  HUONG-DAN-QUAY-VIDEO.md | 141 ----------------------------------------------
+|  README.md               |   7 +--
+|  main.tex                | 122 ---------------------------------------
+|  3 files changed, 3 insertions(+), 267 deletions(-)
+| 
+* commit eceb50d46a361f7b0e050d137227707ab0eb2353
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Mon Jul 6 23:21:28 2026 +0700
+| 
+|     chore(report): split AI-audit and bug-reporter procedures into standalone skills; skills are user-invoked, never call each other
+| 
+|  .claude/skills/ai-audit-logger/SKILL.md |  49 +++++++++
+|  .claude/skills/bug-reporter/SKILL.md    |  66 ++++++++++++
+|  .claude/skills/domain-bva-test/SKILL.md |   9 +-
+|  CLAUDE.md                               | 165 +++---------------------------
+|  4 files changed, 137 insertions(+), 152 deletions(-)
+| 
+* commit 88f231d048e417bf32b487505187e499fb7549e0
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Mon Jul 6 23:21:18 2026 +0700
+| 
+|     docs(report): trim main report to Domain+BVA, separate out bug/audit/summary, drop lecture refs, reduce emphasis
+| 
+|  README.md |   34 +-
+|  main.tex  | 1113 ++++++++---------------------------------------------------
+|  2 files changed, 163 insertions(+), 984 deletions(-)
+| 
+* commit fd8a2bd0905a44bb2b21fcaee602943a67657a85
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Mon Jul 6 23:21:18 2026 +0700
+| 
+|     chore(report): reset git commit log to blank template for manual fill
+| 
+|  reports/git-commit-log.txt | 35 +++++------------------------------
+|  1 file changed, 5 insertions(+), 30 deletions(-)
+| 
+* commit 80f0a4dc7d6d61b7c792bf725f31a7bca0bb5fb2
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Mon Jul 6 23:21:18 2026 +0700
+| 
+|     docs(bug): embed bug screenshots in standalone bug report
+| 
+|  reports/bug-report.md | 68 ++++++++++++++++++++++++++++++++++++-------------
+|  1 file changed, 50 insertions(+), 18 deletions(-)
+| 
+* commit 373f550062762e2072160a2d080048e0adb233f9
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Mon Jul 6 23:13:27 2026 +0700
+| 
+|     docs(audit): log FR-09 test design and BUG-001 filing sessions
+| 
+|  reports/ai-audit-report.tex | 51 +++++++++++++++++++++++++++++++++++++++++++
+|  1 file changed, 51 insertions(+)
+| 
+* commit 7d518ad8cb759187441cb701f1581a04de4507f7
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Mon Jul 6 23:10:11 2026 +0700
+| 
+|     docs(bug): add BUG-001 strong password rejected to LaTeX bug report
+| 
+|  reports/bug-report.tex | 50 ++++++++++++++++++++++++++++++++++++++++++++++++
+|  1 file changed, 50 insertions(+)
+| 
+* commit b2edb45455f5d3bc89b913c0f39584451f278975
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Mon Jul 6 23:03:59 2026 +0700
+| 
+|     test(FR-09): add domain and BVA test-case report for coupon
+| 
+|  figures/{ => bugs}/bug_a_01.png | Bin
+|  figures/{ => bugs}/bug_a_02.png | Bin
+|  figures/{ => bugs}/bug_a_03.png | Bin
+|  figures/{ => bugs}/bug_a_04.png | Bin
+|  figures/{ => bugs}/bug_b_01.png | Bin
+|  figures/{ => bugs}/bug_b_02.png | Bin
+|  figures/{ => bugs}/bug_b_03.png | Bin
+|  figures/{ => bugs}/bug_b_04.png | Bin
+|  figures/{ => bugs}/bug_c_01.png | Bin
+|  figures/{ => bugs}/bug_c_02.png | Bin
+|  figures/{ => bugs}/bug_c_03.png | Bin
+|  figures/{ => bugs}/bug_c_04.png | Bin
+|  figures/{ => bugs}/bug_d_01.png | Bin
+|  figures/{ => bugs}/bug_d_02.png | Bin
+|  figures/{ => bugs}/bug_d_03.png | Bin
+|  figures/{ => bugs}/bug_d_04.png | Bin
+|  reports/test-cases-FR-09.tex    | 392 ++++++++++++++++++++++++++++++++++++++
+|  17 files changed, 392 insertions(+)
+| 
+* commit 1d6c99217cc605bc8a9e056cef45dd4b45bed787
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Sat Jul 4 22:20:08 2026 +0700
+| 
+|     docs(bug): add GitHub Issues page screenshots (list + 16 issues)
+| 
+|  figures/github-issues/issue-01.png    | Bin 0 -> 557652 bytes
+|  figures/github-issues/issue-02.png    | Bin 0 -> 496709 bytes
+|  figures/github-issues/issue-03.png    | Bin 0 -> 468766 bytes
+|  figures/github-issues/issue-04.png    | Bin 0 -> 550101 bytes
+|  figures/github-issues/issue-05.png    | Bin 0 -> 547381 bytes
+|  figures/github-issues/issue-06.png    | Bin 0 -> 532384 bytes
+|  figures/github-issues/issue-07.png    | Bin 0 -> 547157 bytes
+|  figures/github-issues/issue-08.png    | Bin 0 -> 557359 bytes
+|  figures/github-issues/issue-09.png    | Bin 0 -> 491242 bytes
+|  figures/github-issues/issue-10.png    | Bin 0 -> 474554 bytes
+|  figures/github-issues/issue-11.png    | Bin 0 -> 616830 bytes
+|  figures/github-issues/issue-12.png    | Bin 0 -> 522592 bytes
+|  figures/github-issues/issue-13.png    | Bin 0 -> 562531 bytes
+|  figures/github-issues/issue-14.png    | Bin 0 -> 665591 bytes
+|  figures/github-issues/issue-15.png    | Bin 0 -> 606073 bytes
+|  figures/github-issues/issue-16.png    | Bin 0 -> 548977 bytes
+|  figures/github-issues/issues-list.png | Bin 0 -> 623198 bytes
+|  17 files changed, 0 insertions(+), 0 deletions(-)
+| 
+* commit 1127f6d9f01c35069e3a538df2c4ed58c8e23d3e
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Sat Jul 4 22:00:45 2026 +0700
+| 
+|     docs(report): enable 16 bug screenshots in report figures
+| 
+|  main.tex | 32 ++++++++++++++++----------------
+|  1 file changed, 16 insertions(+), 16 deletions(-)
+| 
+* commit 1edf07a4bd1faff862cf77bae9d8c5505a3cec84
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Sat Jul 4 22:00:45 2026 +0700
+| 
+|     docs(audit): replace AI audit template with filled report (docx)
+| 
+|  AI_Audit_Report_Vn_filled.docx              | Bin 0 -> 31346 bytes
+|  _AI-02__-_FIT_HCMUS_-_AI_Audit_Report_Vn.md |  85 --------------------------
+|  2 files changed, 85 deletions(-)
+| 
+* commit 13275ceee0505c5aaefe2556f85d756448ea7522
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Sat Jul 4 21:31:31 2026 +0700
+| 
+|     docs(bug): link 16 GitHub issues (group repo) in report and bug list
+|     
+|     Issues created on dinosauce-285/Software-Testing-G02 (#1-16),
+|     mapping BUG-A-01..D-04 in order.
+| 
+|  main.tex              | 32 ++++++++++++++++----------------
+|  reports/bug-report.md | 32 ++++++++++++++++----------------
+|  2 files changed, 32 insertions(+), 32 deletions(-)
+| 
+* commit 226bbe474dad31f730127a3f31e4537c90afc97a
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Sat Jul 4 21:26:41 2026 +0700
+| 
+|     chore(report): recapture bug screenshots on UI (Playwright), drop stale ones
+|     
+|     - fresh A/B/C screenshots via web + admin UI (Playwright + system Chrome)
+|     - remove orphaned bug_a_05/06, bug_b_05, bug_c_05 (bugs dropped in UI rescope)
+|     - keep bug_d_01..04 (mobile unchanged)
+| 
+|  figures/bug_a_01.png | Bin 81909 -> 34426 bytes
+|  figures/bug_a_02.png | Bin 162546 -> 22423 bytes
+|  figures/bug_a_03.png | Bin 123406 -> 20872 bytes
+|  figures/bug_a_04.png | Bin 130561 -> 36707 bytes
+|  figures/bug_a_05.png | Bin 117914 -> 0 bytes
+|  figures/bug_a_06.png | Bin 154658 -> 0 bytes
+|  figures/bug_b_01.png | Bin 141648 -> 31790 bytes
+|  figures/bug_b_02.png | Bin 128679 -> 27719 bytes
+|  figures/bug_b_03.png | Bin 137975 -> 31237 bytes
+|  figures/bug_b_04.png | Bin 147474 -> 31363 bytes
+|  figures/bug_b_05.png | Bin 140385 -> 0 bytes
+|  figures/bug_c_01.png | Bin 120558 -> 25542 bytes
+|  figures/bug_c_02.png | Bin 110240 -> 27792 bytes
+|  figures/bug_c_03.png | Bin 112576 -> 54293 bytes
+|  figures/bug_c_04.png | Bin 101574 -> 23664 bytes
+|  figures/bug_c_05.png | Bin 145035 -> 0 bytes
+|  16 files changed, 0 insertions(+), 0 deletions(-)
+| 
+* commit 6e35a8a190d83ef05dba507b2baf22cd90f75e78
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Sat Jul 4 21:14:48 2026 +0700
+| 
+|     chore(report): add bug screenshots directory
+|     
+|     Screenshots captured against the earlier API-based bug set; a subset
+|     (Feature C, B-03/B-04) need re-capture on the UI after the rescope.
+| 
+|  figures/README.md    |  35 +++++++++++++++++++++++++++++++++++
+|  figures/bug_a_01.png | Bin 0 -> 81909 bytes
+|  figures/bug_a_02.png | Bin 0 -> 162546 bytes
+|  figures/bug_a_03.png | Bin 0 -> 123406 bytes
+|  figures/bug_a_04.png | Bin 0 -> 130561 bytes
+|  figures/bug_a_05.png | Bin 0 -> 117914 bytes
+|  figures/bug_a_06.png | Bin 0 -> 154658 bytes
+|  figures/bug_b_01.png | Bin 0 -> 141648 bytes
+|  figures/bug_b_02.png | Bin 0 -> 128679 bytes
+|  figures/bug_b_03.png | Bin 0 -> 137975 bytes
+|  figures/bug_b_04.png | Bin 0 -> 147474 bytes
+|  figures/bug_b_05.png | Bin 0 -> 140385 bytes
+|  figures/bug_c_01.png | Bin 0 -> 120558 bytes
+|  figures/bug_c_02.png | Bin 0 -> 110240 bytes
+|  figures/bug_c_03.png | Bin 0 -> 112576 bytes
+|  figures/bug_c_04.png | Bin 0 -> 101574 bytes
+|  figures/bug_c_05.png | Bin 0 -> 145035 bytes
+|  figures/bug_d_01.png | Bin 0 -> 110618 bytes
+|  figures/bug_d_02.png | Bin 0 -> 141843 bytes
+|  figures/bug_d_03.png | Bin 0 -> 135751 bytes
+|  figures/bug_d_04.png | Bin 0 -> 104096 bytes
+|  21 files changed, 35 insertions(+)
+| 
+* commit 7e8b66e0a880b5c1b5e877a9206c921df445ab29
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Sat Jul 4 21:14:48 2026 +0700
+| 
+|     docs(report): add README, video guide and markdown deliverables (UI scope)
+|     
+|     - README + bug-report.md + ai-critique-and-audit.md synced to 61 cases / 16 bugs
+|     - video guide: demo on browser/app UI instead of curl
+|     - include mandatory AI audit report template
+| 
+|  HUONG-DAN-QUAY-VIDEO.md                     | 141 ++++++++++++++
+|  README.md                                   | 132 +++++++++++++
+|  _AI-02__-_FIT_HCMUS_-_AI_Audit_Report_Vn.md |  85 +++++++++
+|  reports/ai-critique-and-audit.md            |  86 +++++++++
+|  reports/bug-report.md                       | 263 ++++++++++++++++++++++++++
+|  reports/git-commit-log.txt                  |  30 +++
+|  6 files changed, 737 insertions(+)
+| 
+* commit 922931c1d1d1c7f2268bc3c4e4175c6bb0f238a3
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Sat Jul 4 21:14:36 2026 +0700
+| 
+|     refactor(report): rescope all four features to functional testing from UI
+|     
+|     Per instructor ruling (functional testing from UI Frontend), rewrite
+|     Features A-D to UI-driven cases and drop API-only cases/bugs:
+|     - A (Register form), B (Checkout page), C (admin Danh muc tab), D (Expo app)
+|     - 61 test cases / 16 bugs (was 78/20); dropped backend-no-validation,
+|       plaintext password, admin authz, forge user_id, non-existent-id
+|     - update Test Summary, AI Critique, add AI-audit Interaction 6, audit form
+| 
+|  main.tex | 918 +++++++++++++++++++++++++++++++++++--------------------------
+|  1 file changed, 532 insertions(+), 386 deletions(-)
+| 
+* commit ef5dad058cff31031095a4a65dc02fd55d1e7e01
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Sat Jul 4 19:29:04 2026 +0700
+| 
+|     test(report): add EC-to-TC and boundary coverage matrices, trim overview
+| 
+|  main.tex | 618 ++++++++++++++++++++++++++++++++++++++++++++++---------------
+|  1 file changed, 469 insertions(+), 149 deletions(-)
+| 
+* commit 943d8e2184c43a34278ea36ac43a51c954454867
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Wed Jul 1 22:36:58 2026 +0700
+| 
+|     docs(audit): log domain testing session for FR-07
+| 
+|  main.tex | 39 ++++++++++++++++++++++++++++++++++++---
+|  1 file changed, 36 insertions(+), 3 deletions(-)
+| 
+* commit 22b497388163c90b6c6960899a62fe392dc974b4
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Wed Jul 1 22:32:51 2026 +0700
+| 
+|     docs(bug): report BUG-D-01..04 candidate bugs for mobile cart
+| 
+|  main.tex | 80 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+|  1 file changed, 79 insertions(+), 1 deletion(-)
+| 
+* commit 888c45763f2cd67f47266477e13da5aae47eff10
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Wed Jul 1 22:30:49 2026 +0700
+| 
+|     test(FR-07): design domain testing and BVA cases for mobile cart
+| 
+|  main.tex | 215 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+|  1 file changed, 211 insertions(+), 4 deletions(-)
+| 
+* commit afd3e2d8b00ad916400b35012665a8e97613fed5
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Wed Jul 1 22:23:01 2026 +0700
+| 
+|     docs(audit): log domain testing session for FR-14
+| 
+|  main.tex | 37 +++++++++++++++++++++++++++++++++++--
+|  1 file changed, 35 insertions(+), 2 deletions(-)
+| 
+* commit 470cdbc12dd912f53c31bd6059610909494266fe
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Wed Jul 1 22:22:02 2026 +0700
+| 
+|     docs(bug): report BUG-C-01..05 candidate bugs for category CRUD
+| 
+|  main.tex | 101 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+|  1 file changed, 100 insertions(+), 1 deletion(-)
+| 
+* commit 61f3cf1346d4ffb68bcc0dc2c7175051b7144d3c
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Wed Jul 1 22:21:14 2026 +0700
+| 
+|     test(FR-14): design domain testing and BVA cases for category CRUD
+| 
+|  main.tex | 225 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+|  1 file changed, 222 insertions(+), 3 deletions(-)
+| 
+* commit 6b7852b140e130d0d2def6ec35c002d7635ed473
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Wed Jul 1 22:17:48 2026 +0700
+| 
+|     docs(report): add completion-status checklist in overview
+| 
+|  main.tex | 48 +++++++++++++++++++++++++++++++++++++++++++++++-
+|  1 file changed, 47 insertions(+), 1 deletion(-)
+| 
+* commit 088c2fc1264875f1e2b583b7eef9fbf83a473f87
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Wed Jul 1 22:14:59 2026 +0700
+| 
+|     docs(audit): log domain testing session for FR-09
+| 
+|  main.tex | 30 ++++++++++++++++++++++++++++++
+|  1 file changed, 30 insertions(+)
+| 
+* commit 89cd5f16596c58c782606d33be4c02b40ff528cc
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Wed Jul 1 22:14:59 2026 +0700
+| 
+|     docs(bug): report BUG-B-01..05 candidate bugs for coupons
+| 
+|  main.tex | 104 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+|  1 file changed, 104 insertions(+)
+| 
+* commit 4ba2941aea40ee61050f324d42803fc39d64d513
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Wed Jul 1 22:14:59 2026 +0700
+| 
+|     test(FR-09): design domain testing and BVA cases for coupons
+| 
+|  main.tex | 241 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+|  1 file changed, 234 insertions(+), 7 deletions(-)
+| 
+* commit e3cb282d7985bc2276639bfc51a2232365ce9314
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Wed Jul 1 22:01:00 2026 +0700
+| 
+|     chore: ignore LaTeX build artifacts and editor/OS junk
+| 
+|  .gitignore | 44 ++++++++++++++++++++++++++++++++++++++++++++
+|  1 file changed, 44 insertions(+)
+| 
+* commit fa50f57b300bd5d62bb10d4a56089d8157648665
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Wed Jul 1 21:59:25 2026 +0700
+| 
+|     docs(audit): log domain testing session for FR-01
+| 
+|  main.tex | 23 +++++++++++++----------
+|  1 file changed, 13 insertions(+), 10 deletions(-)
+| 
+* commit b6b16cc01b46c4bbe6b84f56abbeca058170e81c
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Wed Jul 1 21:55:55 2026 +0700
+| 
+|     docs(bug): report BUG-A-01..06 candidate bugs for registration
+| 
+|  main.tex | 125 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-------
+|  1 file changed, 111 insertions(+), 14 deletions(-)
+| 
+* commit bdb7ac9c428d933091890c805516a6333034a7a5
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Wed Jul 1 21:54:45 2026 +0700
+| 
+|     test(FR-01): add AI gap analysis for registration
+| 
+|  main.tex | 25 ++++++++++++++++++++-----
+|  1 file changed, 20 insertions(+), 5 deletions(-)
+| 
+* commit 656fcbbdbbb726daf9ed4aafc804985ebe0c183c
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Wed Jul 1 21:44:14 2026 +0700
+| 
+|     test(FR-01): add 3-value BVA cases for password length and field bounds
+| 
+|  main.tex | 12 ++++++------
+|  1 file changed, 6 insertions(+), 6 deletions(-)
+| 
+* commit c89e58bf5d910503289847414cf53cdbbbe52da9
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Wed Jul 1 21:43:44 2026 +0700
+| 
+|     test(FR-01): identify boundary values for registration fields
+| 
+|  main.tex | 15 ++++++++++-----
+|  1 file changed, 10 insertions(+), 5 deletions(-)
+| 
+* commit 8293fa635693111d4060e1bb014024ac891e806e
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Wed Jul 1 21:37:35 2026 +0700
+| 
+|     test(FR-01): design domain testing cases (TC-A-DT-01..12)
+| 
+|  main.tex | 15 ++++++++++++---
+|  1 file changed, 12 insertions(+), 3 deletions(-)
+| 
+* commit 25d37836fdd713acae899d90b0588eafcebef049
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Wed Jul 1 21:36:38 2026 +0700
+| 
+|     test(FR-01): select ON/OFF/IN test points for password length
+| 
+|  main.tex | 24 +++++++++++++++++++++++-
+|  1 file changed, 23 insertions(+), 1 deletion(-)
+| 
+* commit c96c490835cd6f354ec1d3f02d9dd4b6b12419df
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Wed Jul 1 21:36:11 2026 +0700
+| 
+|     test(FR-01): partition name, email and password domains into equivalence classes
+| 
+|  main.tex | 60 +++++++++++++++++++++++++++++++++++++++++++++++++++++-------
+|  1 file changed, 53 insertions(+), 7 deletions(-)
+| 
+* commit 9120d355bc10d21990e9b011443b8816a2760902
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Wed Jul 1 21:35:34 2026 +0700
+| 
+|     test(FR-01): identify input variables for account registration
+| 
+|  main.tex | 18 +++++++++++++-----
+|  1 file changed, 13 insertions(+), 5 deletions(-)
+| 
+* commit e594510514f6aac55e073091ad0ba14fc63a116c
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Wed Jul 1 21:35:08 2026 +0700
+| 
+|     test(FR-01): describe registration feature and password regex defect
+| 
+|  main.tex | 46 ++++++++++++++++++++++++++++++++++++++++++++--
+|  1 file changed, 44 insertions(+), 2 deletions(-)
+| 
+* commit db4cacdc275eebf558a51d5118d7066892a68d3e
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Wed Jul 1 21:33:48 2026 +0700
+| 
+|     docs(report): list selected features and route FR-01 into main.tex
+| 
+|  main.tex                     |   8 +-
+|  reports/test-cases-FR-01.tex | 247 -----------------------------------------
+|  2 files changed, 4 insertions(+), 251 deletions(-)
+| 
+* commit d3e7616533873840359a7c37495176178bd06e58
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Wed Jul 1 21:27:42 2026 +0700
+| 
+|     test(FR-01): add 3-value BVA cases for password length
+| 
+|  reports/test-cases-FR-01.tex | 27 +++++++++++++++++++++++++++
+|  1 file changed, 27 insertions(+)
+| 
+* commit 2a8bce67999d86dac18898226c674a66130e00db
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Wed Jul 1 21:27:15 2026 +0700
+| 
+|     test(FR-01): identify password-length boundary and build domain matrix
+| 
+|  reports/test-cases-FR-01.tex | 55 ++++++++++++++++++++++++++++++++++++++++++
+|  1 file changed, 55 insertions(+)
+| 
+* commit ada3d1ac11f1ccd0588055c6dcfef0915ff0c815
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Wed Jul 1 21:26:48 2026 +0700
+| 
+|     test(FR-01): partition input domains into equivalence classes
+| 
+|  reports/test-cases-FR-01.tex | 45 ++++++++++++++++++++++++++++++++++++++++++
+|  1 file changed, 45 insertions(+)
+| 
+* commit a95e8bd6e80119081175f0b835b4df50a9f0d363
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Wed Jul 1 21:26:18 2026 +0700
+| 
+|     test(FR-01): identify variables and characterise domains for account registration
+| 
+|  reports/test-cases-FR-01.tex | 120 +++++++++++++++++++++++++++++++++++++++++
+|  1 file changed, 120 insertions(+)
+| 
+* commit c9fb875171254ffc94106d987f410c9a68b9f814
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Wed Jul 1 21:15:04 2026 +0700
+| 
+|     docs: add assignment specs (Markdown) and LaTeX report template, drop empty init.txt
+| 
+|  HW02-Domain-Testing.md | 165 ++++++++++++++
+|  Homework-Policies.md   |  57 +++++
+|  init.txt               |   0
+|  main.tex               | 574 +++++++++++++++++++++++++++++++++++++++++++++++
+|  4 files changed, 796 insertions(+)
+| 
+* commit a1a056c51b7725dd53f923d1ed6fde11248976b9
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Wed Jul 1 21:10:35 2026 +0700
+| 
+|     docs: add CLAUDE.md conventions and domain-bva-test skill
+| 
+|  .claude/skills/domain-bva-test/SKILL.md | 106 ++++++++++++++++
+|  CLAUDE.md                               | 194 ++++++++++++++++++++++++++++++
+|  2 files changed, 300 insertions(+)
+| 
+* commit 83b7f9f85df7e5e887b8a4e64fa1d2fb9a01f8c8
+| Author: dinosauce-285 <thanhbualqt@gmail.com>
+| Date:   Wed Jul 1 21:10:35 2026 +0700
+| 
+|     chore: add group repo as submodule and gitignore the EShop SUT
+| 
+|  .gitignore           | 2 ++
+|  .gitmodules          | 3 +++
+|  Software-Testing-G02 | 1 +
+|  3 files changed, 6 insertions(+)
+| 
+* commit 4072bba26a4b3cbc97abdc10e800564453338151
+  Author: dinosauce-285 <thanhbualqt@gmail.com>
+  Date:   Sun Jun 28 17:31:15 2026 +0700
+  
+      first commit
+  
+   init.txt | 0
+   1 file changed, 0 insertions(+), 0 deletions(-)
